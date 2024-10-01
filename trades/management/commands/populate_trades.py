@@ -59,8 +59,8 @@ class Command(BaseCommand):
                         "electric heating of turnouts (EOR), electrical installations in infrastructure facilities",
         )
         Trade.objects.create(
-            name=ABBREVIATION_TELECOMMUNICATION,
-            abbreviation="TL",
+            name="Telecommunication",
+            abbreviation=ABBREVIATION_TELECOMMUNICATION,
             description="Telecommunications lines, radio communication, dynamic traveller information system",
         )
         Trade.objects.create(
