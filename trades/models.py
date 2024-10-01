@@ -28,4 +28,4 @@ class Trade(models.Model):
         super().save(*args, **kwargs)
 
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]

@@ -30,9 +30,7 @@ class UserManager(BaseUserManager):
 
         return self._create_user(email, password, **extra_fields)
 
-    def with_perm(
-        self, perm, is_active=True, include_superusers=True, backend=None, obj=None
-    ):
+    def with_perm(self, perm, is_active=True, include_superusers=True, backend=None, obj=None):
         if backend is None:
             backends = auth._get_backends(return_tuples=True)
             if len(backends) == 1:
@@ -43,9 +41,7 @@ class UserManager(BaseUserManager):
                     "therefore must provide the `backend` argument."
                 )
         elif not isinstance(backend, str):
-            raise TypeError(
-                "backend must be a dotted import path string (got %r)." % backend
-            )
+            raise TypeError("backend must be a dotted import path string (got %r)." % backend)
         else:
             backend = auth.load_backend(backend)
         if hasattr(backend, "with_perm"):

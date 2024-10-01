@@ -43,8 +43,8 @@ class Command(BaseCommand):
             name="Drainage",
             abbreviation=ABBREVIATION_DRAINAGE,
             description="Surface (ditches, storage reservoir), "
-                        "deep (seeps, drains, absorbent wells) "
-                        "and underground (covered ditches, storm sewerage) drainage",
+            "deep (seeps, drains, absorbent wells) "
+            "and underground (covered ditches, storm sewerage) drainage",
         )
         Trade.objects.create(
             name="Contact System",
@@ -55,8 +55,8 @@ class Command(BaseCommand):
             name="Power Engineering",
             abbreviation=ABBREVIATION_POWER_ENGINEERING,
             description="Non-traction electrical engineering: LPN, transformer stations, MV switching stations. "
-                        "Low-voltage electrical engineering: railway lighting equipments, "
-                        "electric heating of turnouts (EOR), electrical installations in infrastructure facilities",
+            "Low-voltage electrical engineering: railway lighting equipments, "
+            "electric heating of turnouts (EOR), electrical installations in infrastructure facilities",
         )
         Trade.objects.create(
             name="Telecommunication",
@@ -70,4 +70,4 @@ class Command(BaseCommand):
         )
         Trade.objects.create(name="Other", abbreviation=ABBREVIATION_OTHER)
 
-        print("Trades have been completed successfully!")
+        self.stdout.write(self.style.SUCCESS("Trades have been completed successfully!"))
