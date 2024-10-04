@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'trades',
     'users',
     'home_page',
+    'bootstrap5',
 ]
 
 MIDDLEWARE = [
