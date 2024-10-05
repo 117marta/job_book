@@ -6,3 +6,10 @@ h1 {
     color: purple;
     text-shadow: 1px 1px yellow;
 }
+
+.carousel img {
+    height: 700px;
+    width: 100%;
+    object-fit: cover;
+    object-position: center;
+}
