@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -9,6 +11,7 @@
         {% load bootstrap5 %}
         {% bootstrap_css %}
         {% bootstrap_javascript %}
+        <link rel="stylesheet" href="{% static 'css/style.css' %}">
     </head>
     <body>
         <header>
