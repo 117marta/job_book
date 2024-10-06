@@ -5,7 +5,11 @@ from parameterized import parameterized
 from django.test import TestCase
 
 from trades.models import ABBREVIATION_RAILWAY, Trade
-from users.const import BIRTH_DATE_FORM_ERROR
+from users.const import (
+    BIRTH_DATE_FORM_ERROR,
+    PASSWORD_FORM_MATCH_ERROR,
+    PASSWORD_FORM_NUMERIC_ERROR,
+)
 from users.forms import RegistrationForm
 from users.models import SITE_MANAGER, User
 
@@ -13,14 +17,15 @@ from users.models import SITE_MANAGER, User
 class TestUserRegistrationForm(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.email = "email_existing@test.com"
+        cls.password = "c=%j!Qu3&#SSaz47_Of("
+        cls.email = "email@test.com"
         cls.data = {
             "phone": "123123123",
             "role": SITE_MANAGER,
             "trade": Trade.objects.all().values_list("pk", flat=True),
             "email": cls.email,
-            "password1": "123",
-            "password2": "123",
+            "password1": cls.password,
+            "password2": cls.password,
         }
         Trade.objects.create(
             name="Test Name", abbreviation=ABBREVIATION_RAILWAY, description="Test Description"
@@ -73,6 +78,35 @@ class TestUserRegistrationForm(TestCase):
         with freeze_time(fake_date):
             form = RegistrationForm(data=self.data)
             self.data["birth_date"] = datetime.date.today()
+
+        # Assert
+        if is_valid:
+            self.assertTrue(form.is_valid())
+        else:
+            self.assertFalse(form.is_valid())
+            self.assertEqual(expected_errors, form.errors)
+
+    @parameterized.expand(
+        [
+            ("Of$KxIgL8i", "Of$KxIgL8", False),
+            ("123", "123", False),
+            ("[P[=I}QvqJ", "[P[=I}QvqJ", True),
+        ]
+    )
+    def test_registration_password(self, password1, password2, is_valid):
+        """
+        Test different cases of passwords combinations.
+        """
+        # Arrange
+        if password1 != password2:
+            expected_errors = {"__all__": [PASSWORD_FORM_MATCH_ERROR]}
+        else:
+            expected_errors = {"__all__": [PASSWORD_FORM_NUMERIC_ERROR]}
+
+        # Act
+        form = RegistrationForm(data=self.data)
+        self.data["password1"] = password1
+        self.data["password2"] = password2
 
         # Assert
         if is_valid:

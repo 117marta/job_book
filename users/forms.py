@@ -4,7 +4,13 @@ from dateutil.relativedelta import relativedelta
 from django import forms
 
 from trades.models import ABBREVIATION_RAILWAY, Trade
-from users.const import BIRTH_DATE_FORM_ERROR, LEGAL_AGE, TRADE_FORM_HELP_TEXT
+from users.const import (
+    BIRTH_DATE_FORM_ERROR,
+    PASSWORD_FORM_MATCH_ERROR,
+    PASSWORD_FORM_NUMERIC_ERROR,
+    LEGAL_AGE,
+    TRADE_FORM_HELP_TEXT,
+)
 from users.models import User
 
 
@@ -26,8 +32,13 @@ class RegistrationForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        if cleaned_data.get("password1") != cleaned_data.get("password2"):
-            raise forms.ValidationError("The passwords do not match.")
+        password1 = cleaned_data.get("password1")
+        password2 = cleaned_data.get("password2")
+        if password1 and password2:
+            if password1 != password2:
+                raise forms.ValidationError(PASSWORD_FORM_MATCH_ERROR)
+            elif password1.isdigit():
+                raise forms.ValidationError(PASSWORD_FORM_NUMERIC_ERROR)
         return cleaned_data
 
     class Meta:
