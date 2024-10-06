@@ -1,8 +1,7 @@
-from django.contrib.auth import get_user_model
 from django import forms
 
-
-User = get_user_model()
+from trades.models import ABBREVIATION_RAILWAY, Trade
+from users.models import User
 
 
 class RegistrationForm(forms.ModelForm):
@@ -13,6 +12,7 @@ class RegistrationForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields["birth_date"].widget = forms.DateInput(attrs={"type": "date"})
         self.fields["trade"].help_text = "You can choose several options in which you specialize"
+        self.initial["trade"] = Trade.objects.get(abbreviation=ABBREVIATION_RAILWAY).pk
 
     def clean(self):
         cleaned_data = super().clean()

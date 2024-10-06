@@ -7,7 +7,6 @@ def registration(request):
     form = RegistrationForm(request.POST or None)
 
     if request.method == "POST":
-        breakpoint()
         if form.is_valid():
             email = form.cleaned_data.get("email")
             password = form.cleaned_data.get("password2")
