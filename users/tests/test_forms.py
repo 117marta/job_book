@@ -1,8 +1,13 @@
+import datetime
+from freezegun import freeze_time
+from parameterized import parameterized
+
 from django.test import TestCase
 
 from trades.models import ABBREVIATION_RAILWAY, Trade
-from users.models import SITE_MANAGER, User
+from users.const import BIRTH_DATE_FORM_ERROR
 from users.forms import RegistrationForm
+from users.models import SITE_MANAGER, User
 
 
 class TestUserRegistrationForm(TestCase):
@@ -55,6 +60,26 @@ class TestUserRegistrationForm(TestCase):
         # Assert
         self.assertFalse(form.is_valid())
         self.assertEqual(expected_errors, form.errors)
+
+    @parameterized.expand([("2010, 10, 10", False), ("1995, 05, 05", True)])
+    def test_registration_birth_date(self, fake_date, is_valid):
+        """
+        Check if the test will pass depending on the fake date of birth.
+        """
+        # Arrange
+        expected_errors = {"birth_date": [BIRTH_DATE_FORM_ERROR]}
+
+        # Act
+        with freeze_time(fake_date):
+            form = RegistrationForm(data=self.data)
+            self.data["birth_date"] = datetime.date.today()
+
+        # Assert
+        if is_valid:
+            self.assertTrue(form.is_valid())
+        else:
+            self.assertFalse(form.is_valid())
+            self.assertEqual(expected_errors, form.errors)
 
     def test_registration_correct_data(self):
         """
