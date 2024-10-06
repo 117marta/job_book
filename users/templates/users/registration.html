@@ -1,0 +1,16 @@
+{% extends "home_page/base.html" %}
+
+
+{% block title %}{{ block.super }} Registration{% endblock %}
+
+{% block content %}
+    <h2>Register to take full advantages of the site!</h2>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary" >Register</button>
+        </div>
+    </form>
+{% endblock %}
