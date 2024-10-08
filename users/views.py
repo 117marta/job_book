@@ -2,6 +2,12 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.shortcuts import redirect, render
 
+from users.const import (
+    FORM_ERROR_MESSAGE,
+    LOGIN_FAIL_MESSAGE,
+    LOGIN_SUCCESS_MESSAGE,
+    REGISTER_SUCCESS_MESSAGE,
+)
 from users.forms import LoginForm, RegistrationForm
 from users.models import User
 
@@ -29,7 +35,10 @@ def registration(request):
                 birth_date=birth_date,
             )
             user.trade.set(trade)
+            messages.success(request, REGISTER_SUCCESS_MESSAGE)
             return redirect("home-page")
+        else:
+            messages.error(request, FORM_ERROR_MESSAGE)
     return render(request=request, template_name="users/registration.html", context={"form": form})
 
 
@@ -43,9 +52,9 @@ def logging(request):
             user = authenticate(email=email, password=password)
             if user:
                 login(request, user)
-                messages.success(request, "Logged in successfully!")
+                messages.success(request, LOGIN_SUCCESS_MESSAGE)
                 return redirect("home-page")
             else:
-                messages.error(request, "Incorrect email or password!")
+                messages.error(request, LOGIN_FAIL_MESSAGE)
 
     return render(request, "users/login.html", {"form": form})

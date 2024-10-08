@@ -1,6 +1,6 @@
 import datetime
 
-from django.test import TestCase
+from django.test import Client, TestCase
 from freezegun import freeze_time
 from parameterized import parameterized
 
@@ -9,6 +9,8 @@ from users.const import (
     BIRTH_DATE_FORM_ERROR,
     PASSWORD_FORM_MATCH_ERROR,
     PASSWORD_FORM_NUMERIC_ERROR,
+    PASSWORD_NUMERIC,
+    PASSWORD_STRONG,
 )
 from users.forms import RegistrationForm
 from users.models import SITE_MANAGER, User
@@ -17,15 +19,14 @@ from users.models import SITE_MANAGER, User
 class TestUserRegistrationForm(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.password = "c=%j!Qu3&#SSaz47_Of("
         cls.email = "email@test.com"
         cls.data = {
             "phone": "123123123",
             "role": SITE_MANAGER,
             "trade": Trade.objects.all().values_list("pk", flat=True),
             "email": cls.email,
-            "password1": cls.password,
-            "password2": cls.password,
+            "password1": PASSWORD_STRONG,
+            "password2": PASSWORD_STRONG,
         }
         Trade.objects.create(
             name="Test Name", abbreviation=ABBREVIATION_RAILWAY, description="Test Description"
@@ -89,8 +90,8 @@ class TestUserRegistrationForm(TestCase):
     @parameterized.expand(
         [
             ("Of$KxIgL8i", "Of$KxIgL8", False),
-            ("123", "123", False),
-            ("[P[=I}QvqJ", "[P[=I}QvqJ", True),
+            (PASSWORD_NUMERIC, PASSWORD_NUMERIC, False),
+            (PASSWORD_STRONG, PASSWORD_STRONG, True),
         ]
     )
     def test_registration_password(self, password1, password2, is_valid):
@@ -127,3 +128,33 @@ class TestUserRegistrationForm(TestCase):
 
         # Assert
         self.assertTrue(form.is_valid())
+
+
+class TestUserLoginForm(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.email = "email_login@test.com"
+
+    def setUp(self):
+        self.client = Client()
+
+    @parameterized.expand(
+        [
+            (PASSWORD_STRONG, True),
+            (PASSWORD_NUMERIC, False),
+        ]
+    )
+    def test_login_form(self, password, is_valid):
+        # Arrange
+        self.user = User.objects.create(email=self.email)
+        self.user.set_password(password)
+        self.user.save()
+
+        # Act
+        user_login = self.client.login(email=self.email, password=PASSWORD_STRONG)
+
+        # Assert
+        if is_valid:
+            self.assertTrue(user_login)
+        else:
+            self.assertFalse(user_login)
