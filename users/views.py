@@ -1,6 +1,8 @@
+from django.contrib import messages
+from django.contrib.auth import authenticate, login
 from django.shortcuts import redirect, render
 
-from users.forms import RegistrationForm
+from users.forms import LoginForm, RegistrationForm
 from users.models import User
 
 
@@ -29,3 +31,21 @@ def registration(request):
             user.trade.set(trade)
             return redirect("home-page")
     return render(request=request, template_name="users/registration.html", context={"form": form})
+
+
+def logging(request):
+    form = LoginForm(request.POST or None)
+
+    if request.method == "POST":
+        if form.is_valid():
+            email = form.cleaned_data.get("email")
+            password = form.cleaned_data.get("password")
+            user = authenticate(email=email, password=password)
+            if user:
+                login(request, user)
+                messages.success(request, "Logged in successfully!")
+                return redirect("home-page")
+            else:
+                messages.error(request, "Incorrect email or password!")
+
+    return render(request, "users/login.html", {"form": form})

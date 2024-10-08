@@ -45,3 +45,8 @@ class RegistrationForm(forms.ModelForm):
         model = User
         fields = ["first_name", "last_name", "phone", "role", "trade", "birth_date", "email"]
         widgets = {"trade": forms.CheckboxSelectMultiple}
+
+
+class LoginForm(forms.Form):
+    email = forms.CharField(label="E-mail")
+    password = forms.CharField(widget=forms.PasswordInput)
