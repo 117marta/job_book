@@ -1,6 +1,7 @@
-from django.test import TestCase, Client
-from django.urls import reverse
 import datetime
+
+from django.test import Client, TestCase
+from django.urls import reverse
 
 from trades.models import ABBREVIATION_RAILWAY, Trade
 from users.models import SITE_MANAGER, User

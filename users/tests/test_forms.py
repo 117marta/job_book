@@ -1,8 +1,8 @@
 import datetime
-from freezegun import freeze_time
-from parameterized import parameterized
 
 from django.test import TestCase
+from freezegun import freeze_time
+from parameterized import parameterized
 
 from trades.models import ABBREVIATION_RAILWAY, Trade
 from users.const import (

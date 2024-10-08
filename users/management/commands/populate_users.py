@@ -1,7 +1,7 @@
-from faker import Faker
 from random import choice
 
 from django.core.management.base import BaseCommand
+from faker import Faker
 
 from trades.models import (
     ABBREVIATION_BRIDGE,
@@ -17,11 +17,11 @@ from trades.models import (
     Trade,
 )
 from users.models import (
+    CLERK_OF_THE_WORKS,
     CONTRACT_DIRECTOR,
     CONTRACT_MANAGER,
-    CLERK_OF_THE_WORKS,
-    SITE_MANAGER,
     SITE_ENGINEER,
+    SITE_MANAGER,
     SUBCONTRACTOR,
     SURVEYOR,
     User,
