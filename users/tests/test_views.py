@@ -1,4 +1,5 @@
 import datetime
+from urllib.parse import urlencode
 
 from django.contrib.messages import get_messages
 from django.test import Client, TestCase
@@ -141,6 +142,37 @@ class TestUserPanel(TestCase):
         _assert_redirects_and_response_messages(
             self, response, response_messages, LOGIN_NECESSITY_MESSAGE, "info"
         )
+
+    def test_get_logged_in_user_can_enter(self):
+        # Arrange
+        self.client.force_login(user=self.user)
+
+        # Act
+        response = self.client.get(self.url)
+
+        # Assert
+        self.assertEqual(response.status_code, 200)
+
+
+class TestUsersAll(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.url = reverse("users-all")
+        cls.email = "email_user@test.pl"
+        cls.user = User.objects.create_user(cls.email, PASSWORD_STRONG, role=SITE_MANAGER)
+
+    def setUp(self):
+        self.client = Client()
+
+    def test_get_not_logged_in_user_cannot_enter(self):
+        # Act
+        response = self.client.get(self.url)
+        redirect_url = f"{reverse('login')}?{urlencode({'next': self.url})}"
+
+        # Assert
+        breakpoint()
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, redirect_url)
 
     def test_get_logged_in_user_can_enter(self):
         # Arrange

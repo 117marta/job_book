@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 
 from users.const import (
@@ -75,3 +76,9 @@ def panel(request):
     else:
         messages.info(request, LOGIN_NECESSITY_MESSAGE)
         return redirect("home-page")
+
+
+@login_required(login_url="login")
+def users_all(request):
+    users = User.objects.all().order_by("last_name", "first_name")
+    return render(request=request, template_name="users/users_all.html", context={"users": users})
