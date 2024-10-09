@@ -1,0 +1,45 @@
+{% extends "home_page/base.html" %}
+
+
+{% block title %}{{ block.super }} Panel{% endblock %}
+
+{% block content %}
+    <div class="container about-me rounded p-3" style="background-color:lightcyan;">
+        <h2 class="mb-5">About me</h2>
+
+        <div class="row py-2">
+            <div class="col-sm-3">First Name</div>
+            <div class="col-sm-9">{{ user.first_name }}</div>
+        </div>
+        <div class="row py-2">
+            <div class="col-sm-3">Last name</div>
+            <div class="col-sm-9">{{ user.last_name }}</div>
+        </div>
+        <div class="row py-2">
+            <div class="col-sm-3">E-mail</div>
+            <div class="col-sm-9">{{ user.email }}</div>
+        </div>
+        <div class="row py-2">
+            <div class="col-sm-3">Phone</div>
+            <div class="col-sm-9">{{ user.phone }}</div>
+        </div>
+        <div class="row py-2">
+            <div class="col-sm-3">Role</div>
+            <div class="col-sm-9">{{ user.get_role_display }}</div>
+        </div>
+        <div class="row py-2">
+            <div class="col-sm-3">Trades</div>
+            <div class="col-sm-9">
+                {% for trade in user.trade.all %}
+                    <span class="badge bg-secondary" >{{ trade }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="row py-2">
+            <div class="col-sm-3">Birth date</div>
+            <div class="col-sm-9">{{ user.birth_date | date:"m-d-Y" }}</div>
+        </div>
+    </div>
+
+
+{% endblock %}

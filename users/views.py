@@ -5,6 +5,7 @@ from django.shortcuts import redirect, render
 from users.const import (
     FORM_ERROR_MESSAGE,
     LOGIN_FAIL_MESSAGE,
+    LOGIN_NECESSITY_MESSAGE,
     LOGIN_SUCCESS_MESSAGE,
     LOGOUT_SUCCESS_MESSAGE,
     REGISTER_SUCCESS_MESSAGE,
@@ -65,3 +66,12 @@ def log_out(request):
     logout(request)
     messages.success(request, LOGOUT_SUCCESS_MESSAGE)
     return redirect("home-page")
+
+
+def panel(request):
+    user = request.user
+    if user and user.is_authenticated:
+        return render(request=request, template_name="users/panel.html", context={"user": user})
+    else:
+        messages.info(request, LOGIN_NECESSITY_MESSAGE)
+        return redirect("home-page")

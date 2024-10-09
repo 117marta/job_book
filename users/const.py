@@ -13,3 +13,6 @@ LOGOUT_SUCCESS_MESSAGE = "You have been logged out!"
 LEGAL_AGE = 18
 PASSWORD_STRONG = "c=%j!Qu3&#SSaz47_Of("
 PASSWORD_NUMERIC = "123"
+
+
+LOGIN_NECESSITY_MESSAGE = "You must be logged in to visit this page"

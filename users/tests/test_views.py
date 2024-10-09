@@ -7,6 +7,7 @@ from django.urls import reverse
 from trades.factories import TradeFactory
 from trades.models import ABBREVIATION_RAILWAY, Trade
 from users.const import (
+    LOGIN_NECESSITY_MESSAGE,
     LOGIN_SUCCESS_MESSAGE,
     LOGOUT_SUCCESS_MESSAGE,
     PASSWORD_STRONG,
@@ -15,11 +16,13 @@ from users.const import (
 from users.models import SITE_MANAGER, User
 
 
-def _assert_redirects_and_response_messages(self, response, response_messages, message_txt):
+def _assert_redirects_and_response_messages(
+    self, response, response_messages, message_txt, alert="success"
+):
     self.assertEqual(response.status_code, 302)
     self.assertRedirects(response, reverse("home-page"))
     self.assertEqual(len(response_messages), 1)
-    self.assertIn("success", response_messages[0].tags)
+    self.assertIn(alert, response_messages[0].tags)
     self.assertEqual(message_txt, response_messages[0].message)
 
 
@@ -117,3 +120,34 @@ class TestUserLogout(TestCase):
         _assert_redirects_and_response_messages(
             self, response, response_messages, LOGOUT_SUCCESS_MESSAGE
         )
+
+
+class TestUserPanel(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.url = reverse("panel")
+        cls.email = "email_panel@test.pl"
+        cls.user = User.objects.create_user(cls.email, PASSWORD_STRONG, role=SITE_MANAGER)
+
+    def setUp(self):
+        self.client = Client()
+
+    def test_get_not_logged_in_user_cannot_enter(self):
+        # Act
+        response = self.client.get(self.url)
+        response_messages = list(get_messages(response.wsgi_request))
+
+        # Assert
+        _assert_redirects_and_response_messages(
+            self, response, response_messages, LOGIN_NECESSITY_MESSAGE, "info"
+        )
+
+    def test_get_logged_in_user_can_enter(self):
+        # Arrange
+        self.client.force_login(user=self.user)
+
+        # Act
+        response = self.client.get(self.url)
+
+        # Assert
+        self.assertEqual(response.status_code, 200)
