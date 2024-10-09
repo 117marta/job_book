@@ -4,7 +4,8 @@ from django.test import Client, TestCase
 from freezegun import freeze_time
 from parameterized import parameterized
 
-from trades.models import ABBREVIATION_RAILWAY, Trade
+from trades.factories import TradeFactory
+from trades.models import ABBREVIATION_RAILWAY
 from users.const import (
     BIRTH_DATE_FORM_ERROR,
     PASSWORD_FORM_MATCH_ERROR,
@@ -19,18 +20,16 @@ from users.models import SITE_MANAGER, User
 class TestUserRegistrationForm(TestCase):
     @classmethod
     def setUpTestData(cls):
+        cls.trade = TradeFactory.create(abbreviation=ABBREVIATION_RAILWAY)
         cls.email = "email@test.com"
         cls.data = {
             "phone": "123123123",
             "role": SITE_MANAGER,
-            "trade": Trade.objects.all().values_list("pk", flat=True),
+            "trade": [cls.trade.pk],
             "email": cls.email,
             "password1": PASSWORD_STRONG,
             "password2": PASSWORD_STRONG,
         }
-        Trade.objects.create(
-            name="Test Name", abbreviation=ABBREVIATION_RAILWAY, description="Test Description"
-        )
 
     def test_registration_empty_data(self):
         """

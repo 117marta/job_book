@@ -4,6 +4,7 @@ from django.contrib.messages import get_messages
 from django.test import Client, TestCase
 from django.urls import reverse
 
+from trades.factories import TradeFactory
 from trades.models import ABBREVIATION_RAILWAY, Trade
 from users.const import LOGIN_SUCCESS_MESSAGE, PASSWORD_STRONG, REGISTER_SUCCESS_MESSAGE
 from users.models import SITE_MANAGER, User
@@ -14,9 +15,7 @@ class TestUserRegistration(TestCase):
     def setUpTestData(cls):
         cls.url = reverse("registration")
         cls.email = "email_registration@test.pl"
-        Trade.objects.create(
-            name="Test Name", abbreviation=ABBREVIATION_RAILWAY, description="Test Description"
-        )
+        TradeFactory.create(abbreviation=ABBREVIATION_RAILWAY)
 
     def setUp(self):
         self.client = Client()
