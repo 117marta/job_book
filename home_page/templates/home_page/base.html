@@ -42,18 +42,27 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Dropdown
+                            <a class="nav-link dropdown-toggle" href="" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                {% if user.is_authenticated %}
+                                    <strong>{{ user.get_full_name }}</strong>
+                                {% else %}
+                                    Log in
+                                {% endif %}
                             </a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item" href="#">Action</a></li>
-                                <li><a class="dropdown-item" href="#">Another action</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="#">Something else here</a></li>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                {% if not user.is_authenticated %}
+                                    <li><a class="dropdown-item" href="{% url 'login' %}">Log in</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'registration' %}">Register</a></li>
+                                {% else %}
+                                    <li><a class="dropdown-item" href="#">Action</a></li>
+                                    <li><a class="dropdown-item" href="#">Another action</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="#">Log out</a></li>
+                                {% endif %}
                             </ul>
                         </li>
                         <li class="nav-item ms-2">
-                            <p class="nav navbar-text">USER</p>
+                            <p class="nav navbar-text">{% now "d-m-Y, H:i" %}</p>
                         </li>
                     </ul>
                 </div>

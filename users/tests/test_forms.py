@@ -147,11 +147,11 @@ class TestUserLoginForm(TestCase):
     def test_login_form(self, password, is_valid):
         # Arrange
         self.user = User.objects.create(email=self.email)
-        self.user.set_password(password)
+        self.user.set_password(PASSWORD_STRONG)
         self.user.save()
 
         # Act
-        user_login = self.client.login(email=self.email, password=PASSWORD_STRONG)
+        user_login = self.client.login(email=self.email, password=password)
 
         # Assert
         if is_valid:
