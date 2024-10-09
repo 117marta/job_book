@@ -7,6 +7,8 @@ REGISTER_SUCCESS_MESSAGE = "The account has been created!"
 LOGIN_SUCCESS_MESSAGE = "Logged in successfully!"
 LOGIN_FAIL_MESSAGE = "Incorrect email or password!"
 FORM_ERROR_MESSAGE = "Errors in the form!"
+LOGOUT_SUCCESS_MESSAGE = "You have been logged out!"
+
 
 LEGAL_AGE = 18
 PASSWORD_STRONG = "c=%j!Qu3&#SSaz47_Of("

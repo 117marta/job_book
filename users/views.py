@@ -1,11 +1,12 @@
 from django.contrib import messages
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import redirect, render
 
 from users.const import (
     FORM_ERROR_MESSAGE,
     LOGIN_FAIL_MESSAGE,
     LOGIN_SUCCESS_MESSAGE,
+    LOGOUT_SUCCESS_MESSAGE,
     REGISTER_SUCCESS_MESSAGE,
 )
 from users.forms import LoginForm, RegistrationForm
@@ -42,7 +43,7 @@ def registration(request):
     return render(request=request, template_name="users/registration.html", context={"form": form})
 
 
-def logging(request):
+def log_in(request):
     form = LoginForm(request.POST or None)
 
     if request.method == "POST":
@@ -58,3 +59,9 @@ def logging(request):
                 messages.error(request, LOGIN_FAIL_MESSAGE)
 
     return render(request, "users/login.html", {"form": form})
+
+
+def log_out(request):
+    logout(request)
+    messages.success(request, LOGOUT_SUCCESS_MESSAGE)
+    return redirect("home-page")

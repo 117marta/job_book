@@ -6,8 +6,21 @@ from django.urls import reverse
 
 from trades.factories import TradeFactory
 from trades.models import ABBREVIATION_RAILWAY, Trade
-from users.const import LOGIN_SUCCESS_MESSAGE, PASSWORD_STRONG, REGISTER_SUCCESS_MESSAGE
+from users.const import (
+    LOGIN_SUCCESS_MESSAGE,
+    LOGOUT_SUCCESS_MESSAGE,
+    PASSWORD_STRONG,
+    REGISTER_SUCCESS_MESSAGE,
+)
 from users.models import SITE_MANAGER, User
+
+
+def _assert_redirects_and_response_messages(self, response, response_messages, message_txt):
+    self.assertEqual(response.status_code, 302)
+    self.assertRedirects(response, reverse("home-page"))
+    self.assertEqual(len(response_messages), 1)
+    self.assertIn("success", response_messages[0].tags)
+    self.assertEqual(message_txt, response_messages[0].message)
 
 
 class TestUserRegistration(TestCase):
@@ -46,12 +59,10 @@ class TestUserRegistration(TestCase):
         response_messages = list(get_messages(response.wsgi_request))
 
         # Assert
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse("home-page"))
+        _assert_redirects_and_response_messages(
+            self, response, response_messages, REGISTER_SUCCESS_MESSAGE
+        )
         self.assertTrue(User.objects.filter(email=self.email).exists())
-        self.assertEqual(len(response_messages), 1)
-        self.assertIn("success", response_messages[0].tags)
-        self.assertEqual(REGISTER_SUCCESS_MESSAGE, response_messages[0].message)
 
 
 class TestUserLogin(TestCase):
@@ -83,8 +94,26 @@ class TestUserLogin(TestCase):
         response_messages = list(get_messages(response.wsgi_request))
 
         # Assert
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse("home-page"))
-        self.assertEqual(len(response_messages), 1)
-        self.assertIn("success", response_messages[0].tags)
-        self.assertEqual(LOGIN_SUCCESS_MESSAGE, response_messages[0].message)
+        _assert_redirects_and_response_messages(
+            self, response, response_messages, LOGIN_SUCCESS_MESSAGE
+        )
+
+
+class TestUserLogout(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.url = reverse("logout")
+        cls.email = "email_logout@test.pl"
+
+    def setUp(self):
+        self.client = Client()
+
+    def test_get_should_return_200(self):
+        # Act
+        response = self.client.get(self.url)
+        response_messages = list(get_messages(response.wsgi_request))
+
+        # Assert
+        _assert_redirects_and_response_messages(
+            self, response, response_messages, LOGOUT_SUCCESS_MESSAGE
+        )
