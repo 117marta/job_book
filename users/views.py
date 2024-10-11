@@ -65,6 +65,7 @@ def log_in(request):
     return render(request, "users/login.html", {"form": form})
 
 
+@login_required(login_url="login")
 def log_out(request):
     logout(request)
     messages.success(request, LOGOUT_SUCCESS_MESSAGE)

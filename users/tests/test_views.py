@@ -109,27 +109,40 @@ class TestUserLogout(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.url = reverse("logout")
-        cls.email = "email_logout@test.pl"
+        cls.user = UserFactory.create()
 
     def setUp(self):
         self.client = Client()
 
-    def test_get_should_return_200(self):
+    def test_get_not_logged_in_user_cannot_log_out(self):
+        # Act
+        response = self.client.get(self.url)
+        redirect_url = f"{reverse('login')}?{urlencode({'next': self.url})}"
+
+        # Assert
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, redirect_url)
+
+    def test_get_logged_in_user_can_log_out(self):
+        # Arrange
+        self.client.force_login(user=self.user)
+
         # Act
         response = self.client.get(self.url)
         response_messages = list(get_messages(response.wsgi_request))
 
         # Assert
         _assert_redirects_and_response_messages(
-            self, response, response_messages, LOGOUT_SUCCESS_MESSAGE
+            self, response, response_messages, LOGOUT_SUCCESS_MESSAGE, "success"
         )
+        self.user.refresh_from_db()
+        self.assertFalse(response.wsgi_request.user.is_authenticated)
 
 
 class TestUserPanel(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.url = reverse("panel")
-        cls.email = "email_panel@test.pl"
         cls.user = UserFactory.create()
 
     def setUp(self):
@@ -160,7 +173,6 @@ class TestUsersAll(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.url = reverse("users-all")
-        cls.email = "email_user@test.pl"
         cls.user = UserFactory.create()
 
     def setUp(self):
