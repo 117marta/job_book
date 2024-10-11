@@ -34,14 +34,15 @@ GENERAL_CONTRACTOR = (
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    first_name = models.CharField(_("first name"), max_length=32, blank=True)
-    last_name = models.CharField(_("last name"), max_length=64, blank=True)
+    first_name = models.CharField(_("first name"), max_length=32)
+    last_name = models.CharField(_("last name"), max_length=64)
     email = models.EmailField(_("email address"), unique=True)
     date_joined = models.DateTimeField(_("date joined"), auto_now_add=True)
-    is_active = models.BooleanField(_("active"), default=True)
+    is_active = models.BooleanField(_("active"), default=False)
+    is_admin = models.BooleanField(_("admin"), default=False)
     role = models.CharField(_("staff role"), max_length=32, choices=ROLES)
     phone = models.CharField(_("phone"), max_length=16)
-    trade = models.ManyToManyField(to=Trade, related_name="users")
+    trades = models.ManyToManyField(to=Trade, related_name="users")
     birth_date = models.DateField(_("date of birth"), blank=True, null=True)
 
     objects = UserManager()

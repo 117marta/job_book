@@ -30,7 +30,7 @@
         <div class="row py-2">
             <div class="col-sm-3">Trades</div>
             <div class="col-sm-9">
-                {% for trade in user.trade.all %}
+                {% for trade in user.trades.all %}
                     <span class="badge bg-secondary" >{{ trade }}</span>
                 {% endfor %}
             </div>

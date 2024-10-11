@@ -34,7 +34,7 @@
                         <td>{{ user.phone }}</td>
                         <td>{{ user.get_role_display }}</td>
                         <td>
-                            {% for trade in user.trade.all %}
+                            {% for trade in user.trades.all %}
                                 <span class="badge bg-secondary" >{{ trade }}</span>
                             {% endfor %}
                         </td>

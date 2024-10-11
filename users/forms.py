@@ -21,8 +21,8 @@ class RegistrationForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["birth_date"].widget = forms.DateInput(attrs={"type": "date"})
-        self.fields["trade"].help_text = TRADE_FORM_HELP_TEXT
-        self.initial["trade"] = Trade.objects.get(abbreviation=ABBREVIATION_RAILWAY).pk
+        self.fields["trades"].help_text = TRADE_FORM_HELP_TEXT
+        self.initial["trades"] = Trade.objects.get(abbreviation=ABBREVIATION_RAILWAY).pk
 
     def clean_birth_date(self):
         if value := self.cleaned_data.get("birth_date"):
@@ -43,8 +43,8 @@ class RegistrationForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ["first_name", "last_name", "phone", "role", "trade", "birth_date", "email"]
-        widgets = {"trade": forms.CheckboxSelectMultiple}
+        fields = ["first_name", "last_name", "phone", "role", "trades", "birth_date", "email"]
+        widgets = {"trades": forms.CheckboxSelectMultiple}
 
 
 class LoginForm(forms.Form):

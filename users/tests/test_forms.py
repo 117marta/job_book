@@ -23,12 +23,15 @@ class TestUserRegistrationForm(TestCase):
         cls.trade = TradeFactory.create(abbreviation=ABBREVIATION_RAILWAY)
         cls.email = "email@test.com"
         cls.data = {
+            "first_name": "Jan",
+            "last_name": "Kowalski",
             "phone": "123123123",
             "role": SITE_MANAGER,
-            "trade": [cls.trade.pk],
+            "trades": [cls.trade.pk],
             "email": cls.email,
             "password1": PASSWORD_STRONG,
             "password2": PASSWORD_STRONG,
+            "is_active": True,
         }
 
     def test_registration_empty_data(self):
@@ -37,9 +40,11 @@ class TestUserRegistrationForm(TestCase):
         """
         # Arrange
         expected_errors = {
+            "first_name": ["This field is required."],
+            "last_name": ["This field is required."],
             "phone": ["This field is required."],
             "role": ["This field is required."],
-            "trade": ["This field is required."],
+            "trades": ["This field is required."],
             "email": ["This field is required."],
             "password1": ["This field is required."],
             "password2": ["This field is required."],
@@ -145,7 +150,7 @@ class TestUserLoginForm(TestCase):
     )
     def test_login_form(self, password, is_valid):
         # Arrange
-        self.user = User.objects.create(email=self.email)
+        self.user = User.objects.create(email=self.email, is_active=True)
         self.user.set_password(PASSWORD_STRONG)
         self.user.save()
 

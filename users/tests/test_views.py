@@ -53,11 +53,12 @@ class TestUserRegistration(TestCase):
             "last_name": "Nowakowska",
             "phone": "123123123",
             "role": SITE_MANAGER,
-            "trade": Trade.objects.all().values_list("pk", flat=True),
+            "trades": Trade.objects.all().values_list("pk", flat=True),
             "birth_date": datetime.date(1964, 6, 3),
             "email": self.email,
             "password1": PASSWORD_STRONG,
             "password2": PASSWORD_STRONG,
+            "is_active": True,
         }
 
         # Act
@@ -93,7 +94,7 @@ class TestUserLogin(TestCase):
             "email": self.email,
             "password": PASSWORD_STRONG,
         }
-        User.objects.create_user(self.email, PASSWORD_STRONG)
+        User.objects.create_user(email=self.email, password=PASSWORD_STRONG, is_active=True)
 
         # Act
         response = self.client.post(self.url, data=data)

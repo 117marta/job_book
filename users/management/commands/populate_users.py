@@ -45,14 +45,15 @@ class Command(BaseCommand):
             last_name=fake.last_name(),
             email=fake.email(),
             password=self.PASSWORD,
+            is_active=True,
             role=role,
             phone=fake.phone_number(),
             birth_date=birth_date,
         )
         if trade:
-            user.trade.add(trade)
+            user.trades.add(trade)
         if trades:
-            user.trade.add(*trades)
+            user.trades.add(*trades)
 
     def handle(self, *args, **options):
         bridge = Trade.objects.get(abbreviation=ABBREVIATION_BRIDGE)

@@ -29,7 +29,7 @@ def registration(request):
             phone = form.cleaned_data.get("phone")
             role = form.cleaned_data.get("role")
             birth_date = form.cleaned_data.get("birth_date")
-            trade = form.cleaned_data.get("trade")
+            trades = form.cleaned_data.get("trades")
             user = User.objects.create_user(
                 email=email,
                 password=password,
@@ -39,7 +39,7 @@ def registration(request):
                 phone=phone,
                 birth_date=birth_date,
             )
-            user.trade.set(trade)
+            user.trades.set(trades)
             messages.success(request, REGISTER_SUCCESS_MESSAGE)
             return redirect("home-page")
         else:
