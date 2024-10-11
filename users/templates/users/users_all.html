@@ -25,9 +25,9 @@
                 </tr>
             </thead>
             <tbody>
-                {% for user in users %}
+                {% for user in page_object %}
                     <tr>
-                        <td>{{ forloop.counter }}</td>
+                        <td>{{ forloop.counter0 | add:page_object.start_index }}</td>
                         <td>{{ user.last_name }}</td>
                         <td>{{ user.first_name }}</td>
                         <td>{{ user.email }}</td>
@@ -45,6 +45,36 @@
                 {% endfor %}
             </tbody>
         </table>
+
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center">
+                <li class="page-item {% if not page_object.has_previous %}disabled{% endif %}">
+                    <a class="page-link" href="{% if page_object.has_previous %}?page={{ page_object.previous_page_number }}{% endif %}">◀️ Previous</a>
+                </li>
+
+                {% for page in adjusted_elided_pages %}
+                    {% if page_object.number == page %}
+                        <li class="page-item active">
+                            <a class="page-link">{{ page }}</a>
+                        </li>
+                    {% else %}
+                        {% if page == paginator.ELLIPSIS %}
+                            <li class="page-item">
+                                <span class="page-link">{{ paginator.ELLIPSIS }}</span>
+                            </li>
+                        {% else %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page }}">{{ page }}</a>
+                            </li>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+
+                <li class="page-item {% if not page_object.has_next %}disabled{% endif %}">
+                    <a class="page-link" href="{% if page_object.has_next %}?page={{ page_object.next_page_number }}{% endif %}">Next ️▶️</a>
+                </li>
+            </ul>
+        </nav>
     </div>
 
 {% endblock %}

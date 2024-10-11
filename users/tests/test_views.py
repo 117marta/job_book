@@ -13,8 +13,10 @@ from users.const import (
     LOGOUT_SUCCESS_MESSAGE,
     PASSWORD_STRONG,
     REGISTER_SUCCESS_MESSAGE,
+    USERS_OBJECTS_PER_PAGE,
 )
 from users.models import SITE_MANAGER, User
+from users.tests.factories import UserFactory
 
 
 def _assert_redirects_and_response_messages(
@@ -128,7 +130,7 @@ class TestUserPanel(TestCase):
     def setUpTestData(cls):
         cls.url = reverse("panel")
         cls.email = "email_panel@test.pl"
-        cls.user = User.objects.create_user(cls.email, PASSWORD_STRONG, role=SITE_MANAGER)
+        cls.user = UserFactory.create()
 
     def setUp(self):
         self.client = Client()
@@ -159,7 +161,7 @@ class TestUsersAll(TestCase):
     def setUpTestData(cls):
         cls.url = reverse("users-all")
         cls.email = "email_user@test.pl"
-        cls.user = User.objects.create_user(cls.email, PASSWORD_STRONG, role=SITE_MANAGER)
+        cls.user = UserFactory.create()
 
     def setUp(self):
         self.client = Client()
@@ -170,7 +172,6 @@ class TestUsersAll(TestCase):
         redirect_url = f"{reverse('login')}?{urlencode({'next': self.url})}"
 
         # Assert
-        breakpoint()
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, redirect_url)
 
@@ -183,3 +184,18 @@ class TestUsersAll(TestCase):
 
         # Assert
         self.assertEqual(response.status_code, 200)
+
+    def test_users_all_pagination(self):
+        # Arrange
+        self.client.force_login(user=self.user)
+        UserFactory.create_batch(size=20)
+
+        # Act
+        response = self.client.get(self.url)
+
+        # Assert
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context["paginator"].count, User.objects.count(), USERS_OBJECTS_PER_PAGE + 1
+        )
+        self.assertEqual(response.context["paginator"].num_pages, 2)

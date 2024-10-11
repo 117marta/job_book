@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.shortcuts import redirect, render
 
 from users.const import (
@@ -10,6 +11,7 @@ from users.const import (
     LOGIN_SUCCESS_MESSAGE,
     LOGOUT_SUCCESS_MESSAGE,
     REGISTER_SUCCESS_MESSAGE,
+    USERS_OBJECTS_PER_PAGE,
 )
 from users.forms import LoginForm, RegistrationForm
 from users.models import User
@@ -81,4 +83,20 @@ def panel(request):
 @login_required(login_url="login")
 def users_all(request):
     users = User.objects.all().order_by("last_name", "first_name")
-    return render(request=request, template_name="users/users_all.html", context={"users": users})
+    paginator = Paginator(users, per_page=USERS_OBJECTS_PER_PAGE)
+
+    page_number = request.GET.get("page")
+    page_object = paginator.get_page(page_number)
+    adjusted_elided_pages = paginator.get_elided_page_range(
+        number=page_object.number, on_each_side=2, on_ends=1
+    )
+    return render(
+        request=request,
+        template_name="users/users_all.html",
+        context={
+            "users": users,
+            "page_object": page_object,
+            "paginator": paginator,
+            "adjusted_elided_pages": adjusted_elided_pages,
+        },
+    )
