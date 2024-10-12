@@ -1,6 +1,9 @@
+from smtplib import SMTPException
+
 from django.contrib.auth.models import AbstractBaseUser, AbstractUser, PermissionsMixin
 from django.core.mail import send_mail
 from django.db import models
+from django.http import BadHeaderError
 from django.utils.translation import gettext_lazy as _
 
 from trades.models import Trade
@@ -67,7 +70,14 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def email_user(self, subject, message, from_email=None, **kwargs):
         """Send an e-mail to this user."""
-        send_mail(subject, message, from_email, [self.email], **kwargs)
+        try:
+            send_mail(subject, message, from_email, [self.email], **kwargs)
+        except BadHeaderError:
+            print("Subject is not properly formatted.")
+        except SMTPException as error:
+            print(
+                f"There was an error while trying to send a `{subject}` email to the {self.email} user. {error}"
+            )
 
     def get_role_display(self):
         return dict(ROLES)[self.role]

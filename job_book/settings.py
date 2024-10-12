@@ -147,3 +147,13 @@ MESSAGE_TAGS = {
     messages.WARNING: 'alert-warning',
     messages.ERROR: 'alert-danger',
 }
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = 'smtp.poczta.onet.pl'
+EMAIL_USE_SSL = True
+EMAIL_PORT = 465
+
+try:
+    from local_settings import DEFAULT_FROM_EMAIL, EMAIL_HOST_PASSWORD, EMAIL_HOST_USER
+except ImportError:
+    print("Email Backend is not configured! Please complete the data.")
