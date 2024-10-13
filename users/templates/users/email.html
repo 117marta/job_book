@@ -1,0 +1,53 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="{% static 'css/style.css' %}">
+        <style>
+            .email-container {
+                background-color: white;
+                border: 1px solid lightslategrey;
+                border-radius: 10px;
+                width: 90%;
+                margin: 0 auto;
+            }
+
+            .email-header {
+                background-color: greenyellow;
+                color: black;
+                text-align: center;
+                padding: 20px;
+                border-radius: 10px 10px 0 0;
+            }
+
+            .email-content {
+                padding: 20px;
+            }
+
+            .email-footer {
+                background-color: #f0f0f0;
+                text-align: center;
+                padding: 10px;
+                font-size: 12px;
+                border-radius: 0 0 10px 10px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="email-container">
+            <div class="email-header">
+                MarBud - modern construction
+            </div>
+            <div class="email-content">
+                <p>Hello {{ user_name }},</p>
+                <p>{{ content }}</p>
+                <p>Have a nice day!</p>
+            </div>
+            <div class="email-footer">
+                &copy; {% now "Y" %} MarBud Inc. All rights reserved.
+            </div>
+        </div>
+    </body>
+</html>

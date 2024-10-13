@@ -11,7 +11,7 @@ PASSWORD_FORM_MATCH_ERROR = "The passwords do not match"
 PASSWORD_FORM_NUMERIC_ERROR = "Password can’t be entirely numeric"
 TRADE_FORM_HELP_TEXT = "You can choose several options in which you specialize"
 
-REGISTER_SUCCESS_MESSAGE = "The account has been created!"
+REGISTRATION_SUCCESS_MESSAGE = "The account has been created!"
 LOGIN_SUCCESS_MESSAGE = "Logged in successfully!"
 LOGIN_FAIL_MESSAGE = "Incorrect email or password!"
 FORM_ERROR_MESSAGE = "Errors in the form!"
@@ -20,3 +20,8 @@ LOGOUT_SUCCESS_MESSAGE = "You have been logged out!"
 
 # Views
 LOGIN_NECESSITY_MESSAGE = "You must be logged in to visit this page"
+
+
+# E-mails
+EMAIL_REGISTRATION_CONTENT = "You have successfully created an account in the system. Wait for the administration to confirm your data. After positive verification, you will be able to log in to your account."
+EMAIL_REGISTRATION_SUBJECT = "The account has been created"

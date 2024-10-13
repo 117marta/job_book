@@ -2,17 +2,19 @@ import datetime
 from urllib.parse import urlencode
 
 from django.contrib.messages import get_messages
+from django.core import mail
 from django.test import Client, TestCase
 from django.urls import reverse
 
 from trades.factories import TradeFactory
 from trades.models import ABBREVIATION_RAILWAY, Trade
 from users.const import (
+    EMAIL_REGISTRATION_SUBJECT,
     LOGIN_NECESSITY_MESSAGE,
     LOGIN_SUCCESS_MESSAGE,
     LOGOUT_SUCCESS_MESSAGE,
     PASSWORD_STRONG,
-    REGISTER_SUCCESS_MESSAGE,
+    REGISTRATION_SUCCESS_MESSAGE,
     USERS_OBJECTS_PER_PAGE,
 )
 from users.models import SITE_MANAGER, User
@@ -46,7 +48,7 @@ class TestUserRegistration(TestCase):
         # Assert
         self.assertEqual(response.status_code, 200)
 
-    def test_post_should_create_an_user(self):
+    def test_post_should_create_an_user_and_send_an_email(self):
         # Arrange
         data = {
             "first_name": "Genowefa",
@@ -67,9 +69,11 @@ class TestUserRegistration(TestCase):
 
         # Assert
         _assert_redirects_and_response_messages(
-            self, response, response_messages, REGISTER_SUCCESS_MESSAGE
+            self, response, response_messages, REGISTRATION_SUCCESS_MESSAGE
         )
         self.assertTrue(User.objects.filter(email=self.email).exists())
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].subject, EMAIL_REGISTRATION_SUBJECT)
 
 
 class TestUserLogin(TestCase):

@@ -1,16 +1,19 @@
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+from django.core.paginator import Paginator
 from django.shortcuts import redirect, render
+from django.template.loader import render_to_string
 
 from users.const import (
+    EMAIL_REGISTRATION_CONTENT,
+    EMAIL_REGISTRATION_SUBJECT,
     FORM_ERROR_MESSAGE,
     LOGIN_FAIL_MESSAGE,
     LOGIN_NECESSITY_MESSAGE,
     LOGIN_SUCCESS_MESSAGE,
     LOGOUT_SUCCESS_MESSAGE,
-    REGISTER_SUCCESS_MESSAGE,
+    REGISTRATION_SUCCESS_MESSAGE,
     USERS_OBJECTS_PER_PAGE,
 )
 from users.forms import LoginForm, RegistrationForm
@@ -40,7 +43,20 @@ def registration(request):
                 birth_date=birth_date,
             )
             user.trades.set(trades)
-            messages.success(request, REGISTER_SUCCESS_MESSAGE)
+
+            context = {"user_name": user.get_full_name(), "content": EMAIL_REGISTRATION_CONTENT}
+            template_name = "users/email.html"
+            convert_to_html_content = render_to_string(
+                template_name=template_name,
+                context=context,
+            )
+            user.email_user(
+                subject=EMAIL_REGISTRATION_SUBJECT,
+                message=None,
+                html_message=convert_to_html_content,
+            )
+
+            messages.success(request, REGISTRATION_SUCCESS_MESSAGE)
             return redirect("home-page")
         else:
             messages.error(request, FORM_ERROR_MESSAGE)
