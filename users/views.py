@@ -3,10 +3,11 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.shortcuts import redirect, render
-from django.template.loader import render_to_string
 
 from users.const import (
     ADMIN_NECESSITY_MESSAGE,
+    EMAIL_ACCEPTANCE_CONTENT,
+    EMAIL_ACCEPTANCE_SUBJECT,
     EMAIL_REGISTRATION_CONTENT,
     EMAIL_REGISTRATION_SUBJECT,
     FORM_ERROR_MESSAGE,
@@ -20,6 +21,7 @@ from users.const import (
     USERS_OBJECTS_PER_PAGE,
 )
 from users.forms import AcceptOrDeleteForm, LoginForm, RegistrationForm
+from users.helpers import convert_to_html_content, plain_message
 from users.models import User
 
 
@@ -47,16 +49,16 @@ def registration(request):
             )
             user.trades.set(trades)
 
-            context = {"user_name": user.get_full_name(), "content": EMAIL_REGISTRATION_CONTENT}
-            template_name = "users/email.html"
-            convert_to_html_content = render_to_string(
-                template_name=template_name,
-                context=context,
-            )
             user.email_user(
                 subject=EMAIL_REGISTRATION_SUBJECT,
-                message=None,
-                html_message=convert_to_html_content,
+                message=plain_message(),
+                html_message=convert_to_html_content(
+                    template_name="users/email.html",
+                    context={
+                        "user_name": user.get_full_name(),
+                        "content": EMAIL_REGISTRATION_CONTENT,
+                    },
+                ),
             )
 
             messages.success(request, REGISTRATION_SUCCESS_MESSAGE)
@@ -136,6 +138,18 @@ def accept_or_delete_inactive_users(request):
             users_list = request.POST.getlist("action_checkbox")
             if "action_accept" in request.POST:
                 form.accept_users(users_list)
+                for user in User.objects.filter(pk__in=users_list):
+                    user.email_user(
+                        subject=EMAIL_ACCEPTANCE_SUBJECT,
+                        message=plain_message(),
+                        html_message=convert_to_html_content(
+                            template_name="users/email.html",
+                            context={
+                                "user_name": user.get_full_name(),
+                                "content": EMAIL_ACCEPTANCE_CONTENT,
+                            },
+                        ),
+                    )
                 messages.success(request, USERS_ACCEPTED.format(len(users_list)))
             else:
                 form.delete_users(users_list)

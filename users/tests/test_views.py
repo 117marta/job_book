@@ -10,6 +10,7 @@ from trades.factories import TradeFactory
 from trades.models import ABBREVIATION_RAILWAY, Trade
 from users.const import (
     ADMIN_NECESSITY_MESSAGE,
+    EMAIL_ACCEPTANCE_SUBJECT,
     EMAIL_REGISTRATION_SUBJECT,
     LOGIN_NECESSITY_MESSAGE,
     LOGIN_SUCCESS_MESSAGE,
@@ -266,7 +267,7 @@ class TestAcceptOrDelete(TestCase):
         # Assert
         self.assertEqual(response.status_code, 200)
 
-    def test_post_action_accept_should_accept_users(self):
+    def test_post_action_accept_should_accept_users_and_send_an_email(self):
         # Arrange
         self.client.force_login(user=self.user_admin)
         users_count = User.objects.count()
@@ -285,6 +286,8 @@ class TestAcceptOrDelete(TestCase):
             USERS_ACCEPTED.format(users_to_accept.count()), response_messages[0].message
         )
         self.assertEqual(User.objects.filter(is_active=True).count(), users_count)
+        self.assertEqual(len(mail.outbox), users_to_accept.count())
+        self.assertEqual(set([mail.subject for mail in mail.outbox]), {EMAIL_ACCEPTANCE_SUBJECT})
 
     def test_post_action_delete_should_delete_users(self):
         # Arrange

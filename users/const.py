@@ -26,5 +26,7 @@ USERS_DELETED = "{} user(s) have been deleted"
 
 
 # E-mails
-EMAIL_REGISTRATION_CONTENT = "You have successfully created an account in the system. Wait for the administration to confirm your data. After positive verification, you will be able to log in to your account."
 EMAIL_REGISTRATION_SUBJECT = "The account has been created"
+EMAIL_REGISTRATION_CONTENT = "You have successfully created an account in the system. Wait for the administration to confirm your data. After positive verification, you will be able to log in to your account."
+EMAIL_ACCEPTANCE_SUBJECT = "Your account has been successfully verified"
+EMAIL_ACCEPTANCE_CONTENT = "Your account has been successfully verified! From now on you can take full advantage of the service."
