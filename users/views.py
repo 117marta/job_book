@@ -70,6 +70,7 @@ def registration(request):
 
 def log_in(request):
     form = LoginForm(request.POST or None)
+    next_url = request.GET.get("next")
 
     if request.method == "POST":
         if form.is_valid():
@@ -79,7 +80,10 @@ def log_in(request):
             if user:
                 login(request, user)
                 messages.success(request, LOGIN_SUCCESS_MESSAGE)
-                return redirect("home-page")
+                if next_url:
+                    return redirect(next_url)
+                else:
+                    return redirect("home-page")
             else:
                 messages.error(request, LOGIN_FAIL_MESSAGE)
 
