@@ -1,0 +1,39 @@
+{% extends "home_page/base.html" %}
+
+
+{% block title %}{{ block.super }} Inactive users{% endblock %}
+
+{% block content %}
+    <div class="container rounded p-3" style="background-color:lavenderblush;">
+        <h2 class="mb-5">Accept or delete inactive users</h2>
+
+        {% if inactive_users %}
+            <form method="POST" action="{% url 'accept-or-delete' %}">
+                {% csrf_token %}
+                <div class="row p-2">
+                    <div class="col-sm-4"><strong>Name</strong></div>
+                    <div class="col-sm-4"><strong>E-mail</strong></div>
+                    <div class="col-sm-2"><strong>Role</strong></div>
+                    <div class="col-sm-2"><strong>Phone</strong></div>
+                </div>
+                {% for user in inactive_users %}
+                    <div class="row p-2">
+                        <div class="col-sm-4">
+                            <input type="checkbox" value="{{ user.id }}" name="action_checkbox" class="form-check-input" id="accept_or_delete">
+                            <label for="accept_or_delete" class="form-check-label ps-2">{{ user.get_full_name }}</label>
+                        </div>
+                        <div class="col-sm-4">{{ user.email }}</div>
+                        <div class="col-sm-2">{{ user.get_role_display }}</div>
+                        <div class="col-sm-2">{{ user.phone }}</div>
+                    </div>
+                {% endfor %}
+                <div class="btn-group pt-3" role="group">
+                    <button type="submit" class="btn btn-success me-2" name="action_accept">accept</button>
+                    <button type="submit" class="btn btn-danger" name="action_delete">delete</button>
+                </div>
+            </form>
+        {% else %}
+            No inactive users.
+        {% endif %}
+    </div>
+{% endblock %}

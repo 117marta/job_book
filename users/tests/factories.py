@@ -11,7 +11,7 @@ class UserFactory(factory.django.DjangoModelFactory):
     first_name = factory.Faker("name")
     last_name = factory.Faker("last_name")
     email = factory.Faker("email")
-    is_active = True
+    is_active = False
     phone = factory.Faker("msisdn")
     birth_date = FuzzyDate(start_date=datetime.date(1900, 5, 5), end_date=datetime.date(2005, 5, 5))
     role = FuzzyChoice(dict(ROLES).keys())

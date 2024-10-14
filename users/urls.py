@@ -8,4 +8,5 @@ urlpatterns = [
     path("logout/", views.log_out, name="logout"),
     path("panel/", views.panel, name="panel"),
     path("users-all/", views.users_all, name="users-all"),
+    path("accept-or-delete/", views.accept_or_delete_inactive_users, name="accept-or-delete"),
 ]

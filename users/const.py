@@ -20,6 +20,9 @@ LOGOUT_SUCCESS_MESSAGE = "You have been logged out!"
 
 # Views
 LOGIN_NECESSITY_MESSAGE = "You must be logged in to visit this page"
+ADMIN_NECESSITY_MESSAGE = "You are not authorized to visit this page"
+USERS_ACCEPTED = "{} user(s) have been accepted"
+USERS_DELETED = "{} user(s) have been deleted"
 
 
 # E-mails

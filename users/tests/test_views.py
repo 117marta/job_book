@@ -9,12 +9,15 @@ from django.urls import reverse
 from trades.factories import TradeFactory
 from trades.models import ABBREVIATION_RAILWAY, Trade
 from users.const import (
+    ADMIN_NECESSITY_MESSAGE,
     EMAIL_REGISTRATION_SUBJECT,
     LOGIN_NECESSITY_MESSAGE,
     LOGIN_SUCCESS_MESSAGE,
     LOGOUT_SUCCESS_MESSAGE,
     PASSWORD_STRONG,
     REGISTRATION_SUCCESS_MESSAGE,
+    USERS_ACCEPTED,
+    USERS_DELETED,
     USERS_OBJECTS_PER_PAGE,
 )
 from users.models import SITE_MANAGER, User
@@ -114,7 +117,7 @@ class TestUserLogout(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.url = reverse("logout")
-        cls.user = UserFactory.create()
+        cls.user = UserFactory.create(is_active=True)
 
     def setUp(self):
         self.client = Client()
@@ -148,7 +151,7 @@ class TestUserPanel(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.url = reverse("panel")
-        cls.user = UserFactory.create()
+        cls.user = UserFactory.create(is_active=True)
 
     def setUp(self):
         self.client = Client()
@@ -178,7 +181,7 @@ class TestUsersAll(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.url = reverse("users-all")
-        cls.user = UserFactory.create()
+        cls.user = UserFactory.create(is_active=True)
 
     def setUp(self):
         self.client = Client()
@@ -216,3 +219,89 @@ class TestUsersAll(TestCase):
             response.context["paginator"].count, User.objects.count(), USERS_OBJECTS_PER_PAGE + 1
         )
         self.assertEqual(response.context["paginator"].num_pages, 2)
+
+
+class TestAcceptOrDelete(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.url = reverse("accept-or-delete")
+        cls.user_admin = UserFactory.create(is_active=True, is_admin=True)
+        cls.user_active = UserFactory.create(is_active=True)
+        UserFactory.create_batch(3)
+
+    def setUp(self):
+        self.client = Client()
+
+    def test_get_not_logged_in_user_cannot_enter(self):
+        # Act
+        response = self.client.get(self.url)
+        redirect_url = f"{reverse('login')}?{urlencode({'next': self.url})}"
+
+        # Assert
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, redirect_url)
+
+    def test_get_not_admin_user_cannot_enter(self):
+        # Arrange
+        self.client.force_login(user=self.user_active)
+
+        # Act
+        response = self.client.get(self.url)
+        response_messages = list(get_messages(response.wsgi_request))
+
+        # Assert
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("home-page"))
+        self.assertEqual(len(response_messages), 1)
+        self.assertIn("danger", response_messages[0].tags)
+        self.assertEqual(ADMIN_NECESSITY_MESSAGE, response_messages[0].message)
+
+    def test_get_admin_user_can_enter(self):
+        # Arrange
+        self.client.force_login(user=self.user_admin)
+
+        # Act
+        response = self.client.get(self.url)
+
+        # Assert
+        self.assertEqual(response.status_code, 200)
+
+    def test_post_action_accept_should_accept_users(self):
+        # Arrange
+        self.client.force_login(user=self.user_admin)
+        users_count = User.objects.count()
+        users_to_accept = User.objects.filter(is_active=False).values_list("pk", flat=True)
+        data = {"action_checkbox": users_to_accept, "action_accept": [""]}
+
+        # Act
+        response = self.client.post(self.url, data=data)
+        response_messages = list(get_messages(response.wsgi_request))
+
+        # Assert
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response_messages), 1)
+        self.assertIn("success", response_messages[0].tags)
+        self.assertEqual(
+            USERS_ACCEPTED.format(users_to_accept.count()), response_messages[0].message
+        )
+        self.assertEqual(User.objects.filter(is_active=True).count(), users_count)
+
+    def test_post_action_delete_should_delete_users(self):
+        # Arrange
+        self.client.force_login(user=self.user_admin)
+        users_count = User.objects.count()
+        users_to_delete = User.objects.values_list("pk", flat=True)[:2]
+        data = {"action_checkbox": users_to_delete, "action_delete": [""]}
+
+        # Act
+        response = self.client.post(self.url, data=data)
+        response_messages = list(get_messages(response.wsgi_request))
+
+        # Assert
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response_messages), 1)
+        self.assertIn("danger", response_messages[0].tags)
+        self.assertEqual(
+            USERS_DELETED.format(users_to_delete.count()), response_messages[0].message
+        )
+        self.assertEqual(User.objects.count(), users_count - users_to_delete.count())

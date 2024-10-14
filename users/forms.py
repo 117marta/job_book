@@ -50,3 +50,7 @@ class RegistrationForm(forms.ModelForm):
 class LoginForm(forms.Form):
     email = forms.CharField(label="E-mail")
     password = forms.CharField(widget=forms.PasswordInput)
+
+
+class AcceptOrDeleteForm(forms.Form):
+    action_checkbox = forms.BooleanField()

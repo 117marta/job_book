@@ -6,6 +6,7 @@ from django.shortcuts import redirect, render
 from django.template.loader import render_to_string
 
 from users.const import (
+    ADMIN_NECESSITY_MESSAGE,
     EMAIL_REGISTRATION_CONTENT,
     EMAIL_REGISTRATION_SUBJECT,
     FORM_ERROR_MESSAGE,
@@ -14,9 +15,11 @@ from users.const import (
     LOGIN_SUCCESS_MESSAGE,
     LOGOUT_SUCCESS_MESSAGE,
     REGISTRATION_SUCCESS_MESSAGE,
+    USERS_ACCEPTED,
+    USERS_DELETED,
     USERS_OBJECTS_PER_PAGE,
 )
-from users.forms import LoginForm, RegistrationForm
+from users.forms import AcceptOrDeleteForm, LoginForm, RegistrationForm
 from users.models import User
 
 
@@ -116,4 +119,30 @@ def users_all(request):
             "paginator": paginator,
             "adjusted_elided_pages": adjusted_elided_pages,
         },
+    )
+
+
+@login_required(login_url="login")
+def accept_or_delete_inactive_users(request):
+    if not request.user.is_admin:
+        messages.error(request, ADMIN_NECESSITY_MESSAGE)
+        return redirect("home-page")
+
+    form = AcceptOrDeleteForm(request.POST or None)
+    inactive_users = User.objects.filter(is_active=False)
+
+    if request.method == "POST":
+        if form.is_valid():
+            users_list = request.POST.getlist("action_checkbox")
+            if "action_accept" in request.POST:
+                User.objects.filter(pk__in=users_list).update(is_active=True)
+                messages.success(request, USERS_ACCEPTED.format(len(users_list)))
+            else:
+                User.objects.filter(pk__in=users_list).delete()
+                messages.error(request, USERS_DELETED.format(len(users_list)))
+
+    return render(
+        request=request,
+        template_name="users/accept_or_delete.html",
+        context={"form": form, "inactive_users": inactive_users},
     )
