@@ -135,10 +135,10 @@ def accept_or_delete_inactive_users(request):
         if form.is_valid():
             users_list = request.POST.getlist("action_checkbox")
             if "action_accept" in request.POST:
-                User.objects.filter(pk__in=users_list).update(is_active=True)
+                form.accept_users(users_list)
                 messages.success(request, USERS_ACCEPTED.format(len(users_list)))
             else:
-                User.objects.filter(pk__in=users_list).delete()
+                form.delete_users(users_list)
                 messages.error(request, USERS_DELETED.format(len(users_list)))
 
     return render(

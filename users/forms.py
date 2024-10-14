@@ -52,5 +52,15 @@ class LoginForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput)
 
 
-class AcceptOrDeleteForm(forms.Form):
-    action_checkbox = forms.BooleanField()
+class AcceptOrDeleteForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ["is_active"]
+
+    @staticmethod
+    def accept_users(users_list):
+        User.objects.filter(pk__in=users_list).update(is_active=True)
+
+    @staticmethod
+    def delete_users(users_list):
+        User.objects.filter(pk__in=users_list).delete()

@@ -13,8 +13,9 @@ from users.const import (
     PASSWORD_NUMERIC,
     PASSWORD_STRONG,
 )
-from users.forms import RegistrationForm
+from users.forms import AcceptOrDeleteForm, RegistrationForm
 from users.models import SITE_MANAGER, User
+from users.tests.factories import UserFactory
 
 
 class TestUserRegistrationForm(TestCase):
@@ -162,3 +163,49 @@ class TestUserLoginForm(TestCase):
             self.assertTrue(user_login)
         else:
             self.assertFalse(user_login)
+
+
+class TestAcceptOrDeleteForm(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        UserFactory.create(is_active=True)
+        UserFactory.create_batch(4)
+
+    @parameterized.expand(
+        [
+            ("action_accept", "all"),
+            ("action_accept", 2),
+            ("action_delete", "all"),
+            ("action_delete", 2),
+        ],
+    )
+    def test_accept_or_delete(self, action, users_count):
+        # Arrange
+        users_to_action = User.objects.filter(is_active=False).values_list("pk", flat=True)
+        if users_count != "all":
+            users_to_action = users_to_action[:users_count]
+        data = {"action_checkbox": users_to_action, action: [""]}
+
+        # Act
+        form = AcceptOrDeleteForm(data=data)
+        if action == "action_accept":
+            form.accept_users(users_to_action)
+        else:
+            form.delete_users(users_to_action)
+
+        # Assert
+        self.assertTrue(form.is_valid())
+        if users_count == "all":
+            if action == "action_accept":
+                self.assertEqual(User.objects.filter(is_active=True).count(), 5)
+                self.assertEqual(User.objects.filter(is_active=False).count(), 0)
+            else:
+                self.assertEqual(User.objects.filter(is_active=True).count(), 1)
+                self.assertEqual(User.objects.filter(is_active=False).count(), 0)
+        else:
+            if action == "action_accept":
+                self.assertEqual(User.objects.filter(is_active=True).count(), 3)
+                self.assertEqual(User.objects.filter(is_active=False).count(), 2)
+            else:
+                self.assertEqual(User.objects.filter(is_active=True).count(), 1)
+                self.assertEqual(User.objects.filter(is_active=False).count(), 2)
