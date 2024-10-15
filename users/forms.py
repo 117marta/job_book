@@ -43,7 +43,16 @@ class RegistrationForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ["first_name", "last_name", "phone", "role", "trades", "birth_date", "email"]
+        fields = [
+            "first_name",
+            "last_name",
+            "phone",
+            "role",
+            "trades",
+            "birth_date",
+            "email",
+            "avatar",
+        ]
         widgets = {"trades": forms.CheckboxSelectMultiple}
 
 

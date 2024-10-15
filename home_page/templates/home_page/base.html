@@ -53,6 +53,7 @@
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 {% if user.is_authenticated %}
+                                    <img class="rounded-circle article-img me-2" src="{% if user.avatar %}{{ user.avatar.url }}{% else %}{{ default_avatar }}{% endif %}" alt="avatar">
                                     <strong>{{ user.get_full_name }}</strong>
                                 {% else %}
                                     Log in
@@ -70,8 +71,8 @@
                                 {% endif %}
                             </ul>
                         </li>
-                        <li class="nav-item ms-2">
-                            <p class="nav navbar-text">{% now "d-m-Y, H:i" %}</p>
+                        <li class="nav-item ms-2 d-flex align-items-center">
+                            <p class="nav navbar-text align-bottom">{% now "d-m-Y, H:i" %}</p>
                         </li>
                     </ul>
                 </div>

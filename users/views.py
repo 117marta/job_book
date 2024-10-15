@@ -26,7 +26,7 @@ from users.models import User
 
 
 def registration(request):
-    form = RegistrationForm(request.POST or None)
+    form = RegistrationForm(data=request.POST or None, files=request.FILES or None)
 
     if request.method == "POST":
         if form.is_valid():
@@ -38,6 +38,7 @@ def registration(request):
             role = form.cleaned_data.get("role")
             birth_date = form.cleaned_data.get("birth_date")
             trades = form.cleaned_data.get("trades")
+            avatar = form.cleaned_data.get("avatar")
             user = User.objects.create_user(
                 email=email,
                 password=password,
@@ -46,6 +47,7 @@ def registration(request):
                 role=role,
                 phone=phone,
                 birth_date=birth_date,
+                avatar=avatar,
             )
             user.trades.set(trades)
 

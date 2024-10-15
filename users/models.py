@@ -47,6 +47,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     phone = models.CharField(_("phone"), max_length=16)
     trades = models.ManyToManyField(to=Trade, related_name="users")
     birth_date = models.DateField(_("date of birth"), blank=True, null=True)
+    avatar = models.ImageField(_("avatar"), upload_to="avatars", blank=True)
 
     objects = UserManager()
 

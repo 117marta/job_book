@@ -6,7 +6,7 @@
 {% block content %}
     <h2>Register to take full advantages of the site!</h2>
 
-    <form method="post">
+    <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
         <div class="form-actions">
