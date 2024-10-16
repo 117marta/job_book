@@ -2,9 +2,18 @@ import datetime
 
 from dateutil.relativedelta import relativedelta
 from django import forms
+from django.core.files.images import get_image_dimensions
+from PIL import Image
 
 from trades.models import ABBREVIATION_RAILWAY, Trade
 from users.const import (
+    AVATAR_ALLOWED_CONTENT_TYPES,
+    AVATAR_DIMENSION_ERROR,
+    AVATAR_FILE_ERROR,
+    AVATAR_MAX_DIMENSION,
+    AVATAR_MAX_SIZE,
+    AVATAR_SIZE_ERROR,
+    AVATAR_TYPE_ERROR,
     BIRTH_DATE_FORM_ERROR,
     LEGAL_AGE,
     PASSWORD_FORM_MATCH_ERROR,
@@ -29,6 +38,27 @@ class RegistrationForm(forms.ModelForm):
             if value > datetime.date.today() - relativedelta(years=LEGAL_AGE):
                 raise forms.ValidationError(BIRTH_DATE_FORM_ERROR)
             return value
+
+    def clean_avatar(self):
+        if avatar := self.cleaned_data.get("avatar"):
+            if avatar.content_type not in AVATAR_ALLOWED_CONTENT_TYPES:
+                raise forms.ValidationError(AVATAR_TYPE_ERROR)
+            else:
+                try:
+                    with Image.open(avatar) as image:
+                        image.verify()
+                except Exception:
+                    raise forms.ValidationError(AVATAR_FILE_ERROR)
+
+            if avatar.size > AVATAR_MAX_SIZE:
+                raise forms.ValidationError(AVATAR_SIZE_ERROR)
+
+            width, height = get_image_dimensions(avatar)
+            if width > AVATAR_MAX_DIMENSION or height > AVATAR_MAX_DIMENSION:
+                raise forms.ValidationError(
+                    AVATAR_DIMENSION_ERROR.format(max_dimension=AVATAR_MAX_DIMENSION)
+                )
+            return avatar
 
     def clean(self):
         cleaned_data = super().clean()

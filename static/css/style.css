@@ -13,3 +13,10 @@ h1 {
     object-fit: cover;
     object-position: center;
 }
+
+.avatar-image {
+    height: 50px;
+    width: 50px;
+    object-fit: cover;
+    object-position: center;
+}

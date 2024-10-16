@@ -3,6 +3,8 @@ LEGAL_AGE = 18
 PASSWORD_STRONG = "c=%j!Qu3&#SSaz47_Of("
 PASSWORD_NUMERIC = "123"
 USERS_OBJECTS_PER_PAGE = 20
+AVATAR_MAX_DIMENSION = 600
+AVATAR_MAX_SIZE = 2 * 1024 * 1024  # 2 MB
 
 
 # Forms
@@ -16,6 +18,12 @@ LOGIN_SUCCESS_MESSAGE = "Logged in successfully!"
 LOGIN_FAIL_MESSAGE = "Incorrect email or password!"
 FORM_ERROR_MESSAGE = "Errors in the form!"
 LOGOUT_SUCCESS_MESSAGE = "You have been logged out!"
+
+AVATAR_ALLOWED_CONTENT_TYPES = ("image/png", "image/jpg", "image/jpeg")
+AVATAR_DIMENSION_ERROR = "Use image smaller than {max_dimension}x{max_dimension} pixels"
+AVATAR_FILE_ERROR = "Invalid image file"
+AVATAR_SIZE_ERROR = "Avatar size cannot be larger then 2 MB"
+AVATAR_TYPE_ERROR = "Use JPEG or PNG image"
 
 
 # Views

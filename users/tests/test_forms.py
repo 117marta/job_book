@@ -1,12 +1,20 @@
 import datetime
+from io import BytesIO
+from unittest.mock import patch
 
+from django.core.files.uploadedfile import InMemoryUploadedFile, SimpleUploadedFile
 from django.test import Client, TestCase
 from freezegun import freeze_time
 from parameterized import parameterized
+from PIL import Image
 
 from trades.factories import TradeFactory
 from trades.models import ABBREVIATION_RAILWAY
 from users.const import (
+    AVATAR_DIMENSION_ERROR,
+    AVATAR_MAX_DIMENSION,
+    AVATAR_SIZE_ERROR,
+    AVATAR_TYPE_ERROR,
     BIRTH_DATE_FORM_ERROR,
     PASSWORD_FORM_MATCH_ERROR,
     PASSWORD_FORM_NUMERIC_ERROR,
@@ -19,6 +27,11 @@ from users.tests.factories import UserFactory
 
 
 class TestUserRegistrationForm(TestCase):
+    correct_dimensions = (100, 100)
+    correct_size = 1024 * 1024
+    incorrect_dimensions = (700, 700)
+    incorrect_size = correct_size * 5
+
     @classmethod
     def setUpTestData(cls):
         cls.trade = TradeFactory.create(abbreviation=ABBREVIATION_RAILWAY)
@@ -34,6 +47,36 @@ class TestUserRegistrationForm(TestCase):
             "password2": PASSWORD_STRONG,
             "is_active": True,
         }
+
+    @staticmethod
+    def _create_temporary_avatar(file_format, dimensions, file_size):
+        file = BytesIO()
+        image = Image.new("RGB", dimensions)
+        image.save(fp=file, format=file_format)
+        file.seek(0)
+
+        image_file = InMemoryUploadedFile(
+            file=file,
+            field_name=None,
+            name=f"test_image.{file_format}",
+            content_type=file_format,
+            size=file_size,
+            charset=None,
+        )
+        return image_file
+
+    def test_registration_correct_data(self):
+        """
+        Test should pass, because the correct data is sent.
+        """
+        # Arrange
+        self.data["email"] = "email_other@test.com"
+
+        # Act
+        form = RegistrationForm(data=self.data)
+
+        # Assert
+        self.assertTrue(form.is_valid())
 
     def test_registration_empty_data(self):
         """
@@ -121,18 +164,54 @@ class TestUserRegistrationForm(TestCase):
             self.assertFalse(form.is_valid())
             self.assertEqual(expected_errors, form.errors)
 
-    def test_registration_correct_data(self):
+    @parameterized.expand(
+        [
+            ("JPEG", correct_dimensions, correct_size, True),
+            ("JPEG", correct_dimensions, incorrect_size, False),
+            ("JPEG", incorrect_dimensions, correct_size, False),
+            ("JPEG", incorrect_dimensions, incorrect_size, False),
+            ("PNG", correct_dimensions, correct_size, True),
+            ("PNG", correct_dimensions, incorrect_size, False),
+            ("PNG", incorrect_dimensions, correct_size, False),
+            ("PNG", incorrect_dimensions, incorrect_size, False),
+            ("GIF", correct_dimensions, correct_size, False),
+            ("PDF", correct_dimensions, correct_size, False),
+        ]
+    )
+    def test_registration_avatar(self, file_format, file_dimensions, file_size, is_valid):
         """
-        Test should pass, because the correct data is sent.
+        Test different cases of avatar format, dimensions and size combinations.
         """
         # Arrange
-        self.data["email"] = "email_other@test.com"
+        avatar = self._create_temporary_avatar(
+            file_format=file_format, dimensions=file_dimensions, file_size=file_size
+        )
+
+        if file_format == "GIF":
+            expected_errors = {"avatar": [AVATAR_TYPE_ERROR]}
+        elif file_format == "PDF":
+            expected_errors = {
+                "avatar": [
+                    "Upload a valid image. The file you uploaded was either not an image or a corrupted image."
+                ]
+            }
+        else:
+            if file_dimensions != self.correct_dimensions:
+                expected_errors = {
+                    "avatar": [AVATAR_DIMENSION_ERROR.format(max_dimension=AVATAR_MAX_DIMENSION)]
+                }
+            if file_size != self.correct_size:
+                expected_errors = {"avatar": [AVATAR_SIZE_ERROR]}
 
         # Act
-        form = RegistrationForm(data=self.data)
+        form = RegistrationForm(data=self.data, files={"avatar": avatar})
 
         # Assert
-        self.assertTrue(form.is_valid())
+        if is_valid:
+            self.assertTrue(form.is_valid())
+        else:
+            self.assertFalse(form.is_valid())
+            self.assertEqual(expected_errors, form.errors)
 
 
 class TestUserLoginForm(TestCase):
