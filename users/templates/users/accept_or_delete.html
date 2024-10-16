@@ -19,8 +19,8 @@
                 {% for user in inactive_users %}
                     <div class="row p-2">
                         <div class="col-sm-4">
-                            <input type="checkbox" value="{{ user.id }}" name="action_checkbox" class="form-check-input" id="accept_or_delete">
-                            <label for="accept_or_delete" class="form-check-label ps-2">{{ user.get_full_name }}</label>
+                            <input type="checkbox" value="{{ user.id }}" name="action_checkbox" class="form-check-input" id="accept_or_delete_{{ forloop.counter }}">
+                            <label for="accept_or_delete_{{ forloop.counter }}" class="form-check-label ps-2">{{ user.get_full_name }}</label>
                         </div>
                         <div class="col-sm-4">{{ user.email }}</div>
                         <div class="col-sm-2">{{ user.get_role_display }}</div>
