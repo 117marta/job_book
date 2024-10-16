@@ -3,6 +3,15 @@
 
 {% block title %}{{ block.super }} Users{% endblock %}
 
+{% block head %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function (event) {
+            const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+            const tooltipList = [...tooltipTriggerList].map((tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl));
+        });
+    </script>
+{% endblock %}
+
 {% block content %}
 
     <div class="container-fluid" style="background-color:lavender;">
@@ -13,6 +22,7 @@
             <thead>
                 <tr>
                     <th>No</th>
+                    <th>Avatar</th>
                     <th>Last Name</th>
                     <th>First Name</th>
                     <th>E-mail</th>
@@ -26,8 +36,15 @@
             </thead>
             <tbody>
                 {% for user in page_object %}
-                    <tr>
+                    <tr class="align-middle">
                         <td>{{ forloop.counter0 | add:page_object.start_index }}</td>
+                        <td class="text-center">
+                            {% if user.avatar %}
+                                <img class="avatar-image" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" data-bs-title="<img src='{{ user.avatar.url }}'/>" src="{{ user.avatar.url }}" alt="avatar">
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
                         <td>{{ user.last_name }}</td>
                         <td>{{ user.first_name }}</td>
                         <td>{{ user.email }}</td>

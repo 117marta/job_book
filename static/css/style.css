@@ -20,3 +20,7 @@ h1 {
     object-fit: cover;
     object-position: center;
 }
+
+.tooltip.show {
+    opacity: 1;
+}
