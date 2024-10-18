@@ -165,3 +165,22 @@ except ImportError:
 MEDIA_ROOT = os.path.join(BASE_DIR, 'static/media')
 MEDIA_URL = '/media/'
 DEFAULT_AVATAR = MEDIA_URL + 'avatars/default_avatar.png'
+
+
+# Celery & Redis
+CELERY_TIMEZONE = "Europe/Warsaw"
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60
+CELERY_BROKER_URL = "redis://localhost:6379"
+CELERY_RESULT_BACKEND = "redis://localhost:6379"
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django.core.cache.backends.redis.client.DefaultClient",
+        },
+        # "KEY_PREFIX": "example",
+    }
+}
