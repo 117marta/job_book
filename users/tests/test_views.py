@@ -3,7 +3,7 @@ from urllib.parse import urlencode
 
 from django.contrib.messages import get_messages
 from django.core import mail
-from django.test import Client, TestCase
+from django.test import Client, override_settings, TestCase
 from django.urls import reverse
 
 from trades.factories import TradeFactory
@@ -52,6 +52,7 @@ class TestUserRegistration(TestCase):
         # Assert
         self.assertEqual(response.status_code, 200)
 
+    @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
     def test_post_should_create_an_user_and_send_an_email(self):
         # Arrange
         data = {
@@ -267,6 +268,7 @@ class TestAcceptOrDelete(TestCase):
         # Assert
         self.assertEqual(response.status_code, 200)
 
+    @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
     def test_post_action_accept_should_accept_users_and_send_an_email(self):
         # Arrange
         self.client.force_login(user=self.user_admin)
