@@ -1,7 +1,7 @@
 import datetime
 
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Column, Div, Field, Layout, Row
+from crispy_forms.layout import Column, Div, Field, Layout, Row, Submit
 from dateutil.relativedelta import relativedelta
 from django import forms
 from django.core.files.images import get_image_dimensions
@@ -118,6 +118,19 @@ class RegistrationForm(forms.ModelForm):
 class LoginForm(forms.Form):
     email = forms.CharField(label="E-mail")
     password = forms.CharField(widget=forms.PasswordInput)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.layout = Layout(
+            Row(
+                Column("email", css_class="col"),
+            ),
+            Row(
+                Column("password", css_class="col"),
+            ),
+            Submit("submit", "Log in", css_class="btn btn-primary bg-gradient"),
+        )
 
 
 class AcceptOrDeleteForm(forms.ModelForm):
