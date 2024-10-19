@@ -1,16 +1,22 @@
 {% extends "home_page/base.html" %}
+{% load crispy_forms_tags %}
 
 
 {% block title %}{{ block.super }} Registration{% endblock %}
 
 {% block content %}
-    <h2>Register to take full advantages of the site!</h2>
+    <h2 class="ps-2">Register to take full advantages of the site!</h2>
 
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        {{ form.as_p }}
-        <div class="form-actions">
-            <button type="submit" class="btn btn-primary" >Register</button>
+        <div class="card mx-auto mt-5" style="width: 50%; background-color: lightgreen">
+            <div class="card-header bg-success bg-gradient">
+                <h6 class="card-text">Registration - fields with * are required</h6>
+            </div>
+            <div class="card-body">
+                {% crispy form %}
+            </div>
+            <button type="submit" class="py-2 bg-success bg-gradient">Register</button>
         </div>
     </form>
 {% endblock %}

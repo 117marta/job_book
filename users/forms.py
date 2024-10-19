@@ -1,5 +1,7 @@
 import datetime
 
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Column, Div, Field, Layout, Row
 from dateutil.relativedelta import relativedelta
 from django import forms
 from django.core.files.images import get_image_dimensions
@@ -32,6 +34,33 @@ class RegistrationForm(forms.ModelForm):
         self.fields["birth_date"].widget = forms.DateInput(attrs={"type": "date"})
         self.fields["trades"].help_text = TRADE_FORM_HELP_TEXT
         self.initial["trades"] = Trade.objects.get(abbreviation=ABBREVIATION_RAILWAY).pk
+        self.helper = FormHelper()
+        self.helper.layout = Layout(
+            Div(
+                Field("first_name", wrapper_class="col-md-6 "),
+                Field("last_name", wrapper_class="col-md-6 "),
+                css_class="row d-flex justify-content-evenly",
+            ),
+            Div(
+                Field("phone", wrapper_class="col-md-6 "),
+                Field("email", wrapper_class="col-md-6 "),
+                css_class="row d-flex justify-content-evenly",
+            ),
+            Div(
+                Field("password1", wrapper_class="col-md-6 "),
+                Field("password2", wrapper_class="col-md-6 "),
+                css_class="row d-flex justify-content-evenly",
+            ),
+            Row(
+                Column("role", css_class="col-md-4"),
+            ),
+            Field("trades", css_class="custom-class"),
+            Div(
+                Field("birth_date", wrapper_class="col-md-6 "),
+                Field("avatar", wrapper_class="col-md-6 "),
+                css_class="row d-flex justify-content-evenly",
+            ),
+        )
 
     def clean_birth_date(self):
         if value := self.cleaned_data.get("birth_date"):
