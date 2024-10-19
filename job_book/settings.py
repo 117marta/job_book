@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     'users',
     'home_page',
     'bootstrap5',
+    'crispy_forms',
+    'crispy_bootstrap5',
 ]
 
 MIDDLEWARE = [
@@ -184,3 +186,8 @@ CACHES = {
         # "KEY_PREFIX": "example",
     }
 }
+
+
+# Crispy forms
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
