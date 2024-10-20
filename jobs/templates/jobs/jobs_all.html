@@ -1,4 +1,5 @@
 {% extends "home_page/base.html" %}
+{% load job_filters %}
 
 
 {% block title %}{{ block.super }} Jobs{% endblock %}
@@ -17,12 +18,12 @@
                     <th>Contractor</th>
                     <th>Kind</th>
                     <th>Trade</th>
+                    <th>Status</th>
                     <th>Description</th>
                     <th>km from</th>
                     <th>km to</th>
                     <th>Deadline</th>
                     <th>Comments</th>
-                    <th>Status</th>
                     <th>Created</th>
                 </tr>
             </thead>
@@ -34,12 +35,12 @@
                         <td>{{ job.contractor.get_full_name }}</td>
                         <td>{{ job.get_kind_display | capfirst }}</td>
                         <td><span class="badge bg-secondary" >{{ job.trade }}</span></td>
+                        <td>{{ job.get_status_display | capfirst }}</td>
                         <td>{{ job.description }}</td>
-                        <td>{{ job.km_from }}</td>
-                        <td>{{ job.km_to }}</td>
+                        <td>{{ job.km_from | km }}</td>
+                        <td>{{ job.km_to | km }}</td>
                         <td>{{ job.deadline | date:"m-d-Y" }}</td>
                         <td>{{ job.comments }}</td>
-                        <td>{{ job.get_status_display | capfirst }}</td>
                         <td>{{ job.created | date:"d-m-Y H:i" }}</td>
                     </tr>
                 {% endfor %}
