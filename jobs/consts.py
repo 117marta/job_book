@@ -16,3 +16,6 @@ class JobStatuses(models.TextChoices):
     ONGOING = "ongoing", "ongoing"
     FINISHED = "finished", "finished"
     CLOSED = "closed", "closed"
+
+
+JOBS_PER_PAGE = 10

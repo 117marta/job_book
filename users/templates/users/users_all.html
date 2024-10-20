@@ -55,8 +55,8 @@
                                 <span class="badge bg-secondary" >{{ trade }}</span>
                             {% endfor %}
                         </td>
-                        <td>{{ user.birth_date | date:"m-d-Y" }}</td>
-                        <td>{{ user.date_joined | date:"m-d-Y" }}</td>
+                        <td>{{ user.birth_date | date:"d-m-Y" }}</td>
+                        <td>{{ user.date_joined | date:"d-m-Y" }}</td>
                         <td>{{ user.is_active }}</td>
                     </tr>
                 {% endfor %}

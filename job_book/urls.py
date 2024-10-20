@@ -22,4 +22,5 @@ from django.urls import include, path
 urlpatterns = [
     path("home-page/", include("home_page.urls")),
     path("users/", include("users.urls")),
+    path("jobs/", include("jobs.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
