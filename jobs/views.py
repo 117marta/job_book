@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.shortcuts import render
 
@@ -5,6 +6,7 @@ from jobs.consts import JOBS_PER_PAGE
 from jobs.models import Job
 
 
+@login_required(login_url="login")
 def jobs_all(request):
     jobs = Job.objects.all().order_by("created")
     paginator = Paginator(jobs, per_page=JOBS_PER_PAGE)
