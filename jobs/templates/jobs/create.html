@@ -1,0 +1,21 @@
+{% extends "home_page/base.html" %}
+{% load crispy_forms_tags %}
+
+
+{% block title %}{{ block.super }} Job create{% endblock %}
+
+{% block content %}
+    <h2 class="ps-2">Create a new job</h2>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="card mx-auto mt-5" style="width: 80%; background-color: lightcoral">
+            <div class="card-header bg-danger bg-gradient">
+                <h6 class="card-text text-center">Create a job - fields with * are required</h6>
+            </div>
+            <div class="card-body">
+                {% crispy form %}
+            </div>
+        </div>
+    </form>
+{% endblock %}

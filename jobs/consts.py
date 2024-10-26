@@ -19,3 +19,6 @@ class JobStatuses(models.TextChoices):
 
 
 JOBS_PER_PAGE = 10
+
+KM_HELP_TEXT = "Use , or . as a separator"
+JOB_CREATE_SUCCESS_MESSAGE = "The job has been created!"
