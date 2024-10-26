@@ -1,9 +1,11 @@
+import datetime
+
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Div, Field, Layout, Submit
 from django import forms
 from django.db.models import Case, Value, When
 
-from jobs.consts import KM_HELP_TEXT
+from jobs.consts import DEADLINE_FORM_ERROR, KM_HELP_TEXT
 from jobs.models import Job
 from users.models import SURVEYOR, User
 
@@ -52,6 +54,12 @@ class JobCreateForm(forms.ModelForm):
             ),
             Submit("submit", "Create a job", css_class="btn btn-danger bg-gradient"),
         )
+
+    def clean_deadline(self):
+        if value := self.cleaned_data.get("deadline"):
+            if value < datetime.date.today():
+                raise forms.ValidationError(DEADLINE_FORM_ERROR)
+            return value
 
     class Meta:
         model = Job
