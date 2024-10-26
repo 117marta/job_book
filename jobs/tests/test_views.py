@@ -2,10 +2,16 @@ import datetime
 from urllib.parse import urlencode
 
 from django.contrib.messages import get_messages
-from django.test import Client, TestCase
+from django.core import mail
+from django.test import Client, override_settings, TestCase
 from django.urls import reverse
 
-from jobs.consts import JOB_CREATE_SUCCESS_MESSAGE, JobKinds, JOBS_PER_PAGE
+from jobs.consts import (
+    EMAIL_JOB_CREATE_SUBJECT,
+    JOB_CREATE_SUCCESS_MESSAGE,
+    JobKinds,
+    JOBS_PER_PAGE,
+)
 from jobs.models import Job
 from jobs.tests.factories import JobFactory
 from trades.factories import TradeFactory
@@ -69,6 +75,9 @@ class TestJobsCreate(TestCase):
         self.client = Client()
 
     def test_get_not_logged_in_user_cannot_enter(self):
+        """
+        Not logged-in user is not allowed to enter the page.
+        """
         # Act
         response = self.client.get(self.url)
         redirect_url = f"{reverse('login')}?{urlencode({'next': self.url})}"
@@ -78,6 +87,9 @@ class TestJobsCreate(TestCase):
         self.assertRedirects(response, redirect_url)
 
     def test_get_logged_in_user_can_enter(self):
+        """
+        Logged-in user is allowed to enter the page.
+        """
         # Arrange
         self.client.force_login(user=self.principal)
 
@@ -87,7 +99,11 @@ class TestJobsCreate(TestCase):
         # Assert
         self.assertEqual(response.status_code, 200)
 
-    def test_create_a_job(self):
+    @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
+    def test_create_a_job_and_send_an_email(self):
+        """
+        Logged-in user can create a new job and e-mail is sent to the contractor of this job.
+        """
         # Arrange
         self.client.force_login(user=self.principal)
         data = {
@@ -112,3 +128,5 @@ class TestJobsCreate(TestCase):
         self.assertEqual(len(response_messages), 1)
         self.assertIn("success", response_messages[0].tags)
         self.assertEqual(JOB_CREATE_SUCCESS_MESSAGE, response_messages[0].message)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].subject, EMAIL_JOB_CREATE_SUBJECT)

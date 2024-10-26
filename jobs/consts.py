@@ -30,3 +30,8 @@ DEADLINE_FORM_ERROR = "A date from the past was given"
 
 # Views
 JOB_CREATE_SUCCESS_MESSAGE = "The job has been created!"
+
+
+# E-mails
+EMAIL_JOB_CREATE_SUBJECT = "A new job has been assigned to you"
+EMAIL_JOB_CREATE_CONTENT = "A new job has been just created by {} in the {} trade. Check the details and accept or reject this job."

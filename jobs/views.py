@@ -3,9 +3,15 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.shortcuts import redirect, render
 
-from jobs.consts import JOB_CREATE_SUCCESS_MESSAGE, JOBS_PER_PAGE
+from jobs.consts import (
+    EMAIL_JOB_CREATE_CONTENT,
+    EMAIL_JOB_CREATE_SUBJECT,
+    JOB_CREATE_SUCCESS_MESSAGE,
+    JOBS_PER_PAGE,
+)
 from jobs.forms import JobCreateForm
 from jobs.models import Job
+from users.tasks import send_email_with_celery
 
 
 @login_required(login_url="login")
@@ -57,6 +63,14 @@ def job_create(request):
                 deadline=deadline,
                 comments=comments,
             )
+
+            send_email_with_celery.delay(
+                user_pk=contractor.pk,
+                template_name="users/email.html",
+                subject=EMAIL_JOB_CREATE_SUBJECT,
+                content=EMAIL_JOB_CREATE_CONTENT.format(principal.get_full_name(), trade.name),
+            )
+
             messages.success(request, JOB_CREATE_SUCCESS_MESSAGE)
             return redirect("jobs-all")
 
