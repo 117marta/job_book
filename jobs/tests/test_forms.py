@@ -3,10 +3,11 @@ import datetime
 from django.test import TestCase
 from parameterized import parameterized
 
-from jobs.consts import DEADLINE_FORM_ERROR, JobKinds
-from jobs.forms import JobCreateForm
+from jobs.consts import DEADLINE_FORM_ERROR, JobKinds, JobStatuses
+from jobs.forms import JobCreateForm, JobViewForm
+from jobs.tests.factories import JobFactory
 from trades.factories import TradeFactory
-from users.models import SITE_MANAGER, SURVEYOR
+from users.models import SITE_ENGINEER, SITE_MANAGER, SURVEYOR
 from users.tests.factories import UserFactory
 
 
@@ -90,3 +91,70 @@ class TestJobCreateForm(TestCase):
         else:
             self.assertFalse(form.is_valid())
             self.assertEqual(expected_errors, form.errors)
+
+
+class TestJobViewForm(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.principal = UserFactory.create(is_active=True, role=SITE_ENGINEER)
+        cls.contractor = UserFactory.create(is_active=True, role=SURVEYOR)
+        cls.new_contractor = UserFactory.create(is_active=True, role=SURVEYOR)
+        cls.job = JobFactory.create(
+            principal=cls.principal,
+            contractor=cls.contractor,
+            kind=JobKinds.INVENTORY,
+            status=JobStatuses.WAITING,
+        )
+
+    @parameterized.expand(
+        [
+            "all",
+            "contractor",
+            "status",
+            "comments",
+        ]
+    )
+    def test_update_a_job_data(self, changed_data):
+        """
+        Check if the test will pass depending on the data changed.
+        """
+        # Arrange
+        form = JobViewForm(instance=self.job)
+        data = form.initial.copy()
+        new_status = JobStatuses.READY_TO_STAKE_OUT
+        new_comments = "New test comment"
+        finished_status = JobStatuses.FINISHED
+        finished_comments = "The job is finished."
+
+        match changed_data:
+            case "contractor":
+                data["contractor"] = self.new_contractor.pk
+            case "status":
+                data["status"] = new_status
+            case "comments":
+                data["comments"] = new_comments
+            case "all":
+                data = {
+                    "contractor": self.contractor.pk,
+                    "status": finished_status,
+                    "comments": finished_comments,
+                }
+
+        # Act
+        form = JobViewForm(instance=self.job, data=data)
+        form.save()
+
+        # Assert
+        self.assertTrue(form.is_valid())
+        self.job.refresh_from_db()
+        match changed_data:
+            case "contractor":
+                self.assertEqual(self.job.contractor, self.new_contractor)
+            case "status":
+                self.assertEqual(self.job.status, new_status)
+            case "comments":
+                self.assertEqual(self.job.comments, new_comments)
+            case "all":
+                self.assertEqual(self.job.contractor, self.contractor)
+                self.assertEqual(self.job.status, finished_status)
+                self.assertEqual(self.job.comments, finished_comments)
