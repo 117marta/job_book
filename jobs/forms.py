@@ -28,8 +28,6 @@ class JobCreateForm(forms.ModelForm):
         self.fields["km_from"].help_text = self.fields["km_to"].help_text = KM_HELP_TEXT
 
         self.helper = FormHelper()
-        self.helper = FormHelper()
-        self.helper.disable_csrf = True
         self.helper.layout = Layout(
             Div(
                 Field("principal", wrapper_class="col-md-6"),
@@ -52,7 +50,7 @@ class JobCreateForm(forms.ModelForm):
                 Field("comments", wrapper_class="col-md-6"),
                 css_class="row d-flex justify-content-evenly",
             ),
-            Submit("submit", "Create a job", css_class="btn btn-danger bg-gradient"),
+            Submit("submit", "Create a job", css_class="btn btn-warning bg-gradient"),
         )
 
     def clean_deadline(self):
@@ -64,6 +62,57 @@ class JobCreateForm(forms.ModelForm):
     class Meta:
         model = Job
         exclude = ["status"]
+        widgets = {
+            "comments": forms.Textarea(attrs={"rows": 3}),
+            "deadline": forms.DateInput(attrs={"type": "date"}),
+        }
+        field_classes = {
+            "principal": JobModelChoiceField,
+            "contractor": JobModelChoiceField,
+        }
+
+
+class JobViewForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["principal"].initial = self.instance
+        self.fields["contractor"].queryset = User.objects.annotate(
+            match_order=Case(
+                When(role__iexact=SURVEYOR, then=Value(0)),
+                default=Value(1),
+            )
+        ).order_by("match_order", "last_name", "first_name")
+        self.fields["principal"].disabled = True
+        self.fields["kind"].disabled = True
+        self.fields["trade"].disabled = True
+        self.fields["km_from"].disabled = True
+        self.fields["km_to"].disabled = True
+        self.fields["description"].disabled = True
+        self.fields["deadline"].disabled = True
+
+        self.helper = FormHelper()
+        self.helper.layout = Layout(
+            Div(
+                Field("principal", wrapper_class="col-md-4"),
+                Field("contractor", wrapper_class="col-md-4"),
+                Field("status", wrapper_class="col-md-4"),
+                css_class="row d-flex justify-content-evenly",
+            ),
+            Div(
+                Field("km_from", wrapper_class="col-md-2"),
+                Field("km_to", wrapper_class="col-md-2"),
+                Field("deadline", wrapper_class="col-md-2"),
+                Field("kind", wrapper_class="col-md-3"),
+                Field("trade", wrapper_class="col-md-3"),
+                css_class="row d-flex justify-content-evenly",
+            ),
+            Field("description", wrapper_class="col-md-12"),
+            Field("comments", wrapper_class="col-md-12"),
+        )
+
+    class Meta:
+        model = Job
+        fields = "__all__"
         widgets = {
             "comments": forms.Textarea(attrs={"rows": 3}),
             "deadline": forms.DateInput(attrs={"type": "date"}),

@@ -1,15 +1,22 @@
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render, reverse
 
 from jobs.consts import (
+    EMAIL_JOB_CHANGE_CONTRACTOR_CONTENT,
+    EMAIL_JOB_CHANGE_CONTRACTOR_SUBJECT,
+    EMAIL_JOB_CHANGE_STATUS_CONTENT,
+    EMAIL_JOB_CHANGE_STATUS_SUBJECT,
     EMAIL_JOB_CREATE_CONTENT,
     EMAIL_JOB_CREATE_SUBJECT,
     JOB_CREATE_SUCCESS_MESSAGE,
+    JOB_SAVE_SUCCESS_MESSAGE,
     JOBS_PER_PAGE,
+    JobStatuses,
 )
-from jobs.forms import JobCreateForm
+from jobs.forms import JobCreateForm, JobViewForm
 from jobs.models import Job
 from users.tasks import send_email_with_celery
 
@@ -75,3 +82,41 @@ def job_create(request):
             return redirect("jobs-all")
 
     return render(request=request, template_name="jobs/create.html", context={"form": form})
+
+
+def job_view(request, job_pk):
+    job = get_object_or_404(Job, pk=job_pk)
+    form = JobViewForm(data=request.POST or None, instance=job)
+
+    if request.method == "POST":
+        if form.is_valid():
+            principal = form.cleaned_data["principal"]
+            contractor = form.cleaned_data["contractor"]
+            status = form.cleaned_data["status"]
+            if form.has_changed():
+                job_url = settings.BASE_URL + reverse("jobs-job", kwargs={"job_pk": job_pk})
+                if "status" in form.changed_data:
+                    send_email_with_celery.delay(
+                        user_pk=principal.pk,
+                        template_name="users/email.html",
+                        subject=EMAIL_JOB_CHANGE_STATUS_SUBJECT.format(job_pk),
+                        content=EMAIL_JOB_CHANGE_STATUS_CONTENT.format(
+                            job_pk=job_pk,
+                            status=JobStatuses(status).label.capitalize(),
+                            url=job_url,
+                        ),
+                    )
+                if "contractor" in form.changed_data:
+                    send_email_with_celery.delay(
+                        user_pk=contractor.pk,
+                        template_name="users/email.html",
+                        subject=EMAIL_JOB_CHANGE_CONTRACTOR_SUBJECT.format(job_pk),
+                        content=EMAIL_JOB_CHANGE_CONTRACTOR_CONTENT.format(
+                            job_pk=job_pk, trade=job.trade, url=job_url
+                        ),
+                    )
+            form.save()
+            messages.success(request, JOB_SAVE_SUCCESS_MESSAGE)
+            return redirect("jobs-all")
+
+    return render(request, "jobs/job.html", {"job": job, "form": form})

@@ -30,8 +30,13 @@ DEADLINE_FORM_ERROR = "A date from the past was given"
 
 # Views
 JOB_CREATE_SUCCESS_MESSAGE = "The job has been created!"
+JOB_SAVE_SUCCESS_MESSAGE = "The job has been saved!"
 
 
 # E-mails
-EMAIL_JOB_CREATE_SUBJECT = "A new job has been assigned to you"
+EMAIL_JOB_CREATE_SUBJECT = "A new job has been just created and assigned to you"
 EMAIL_JOB_CREATE_CONTENT = "A new job has been just created by {} in the {} trade. Check the details and accept or reject this job."
+EMAIL_JOB_CHANGE_STATUS_SUBJECT = "The job number {} has changed status"
+EMAIL_JOB_CHANGE_STATUS_CONTENT = "The job number {job_pk} has changed status to <strong>{status}</strong>. Check the details here <a href={url}>[CLICK]</a>"
+EMAIL_JOB_CHANGE_CONTRACTOR_SUBJECT = "The job number {} has been assigned to you"
+EMAIL_JOB_CHANGE_CONTRACTOR_CONTENT = "The job number {job_pk} in the {trade} trade has been assigned to you. Check the details here <a href={url}>[CLICK]</a>"

@@ -1,0 +1,24 @@
+{% extends "home_page/base.html" %}
+{% load job_filters %}
+{% load crispy_forms_tags %}
+
+
+{% block title %}{{ block.super }} Jobs{% endblock %}
+
+{% block content %}
+    <h2 class="ps-2">Update a job details to continue further works</h2>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="card mx-auto mt-5" style="width: 90%; background-color: lightgray">
+            <div class="card-header bg-secondary bg-gradient">
+                <h6 class="card-text text-center">Update a job</h6>
+            </div>
+            <div class="card-body">
+                {% crispy form %}
+                <input type="submit" value="Submit" class="btn btn-secondary bg-gradient">
+            </div>
+        </div>
+    </form>
+
+{% endblock %}

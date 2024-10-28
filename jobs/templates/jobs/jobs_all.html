@@ -10,10 +10,10 @@
         <h2>Jobs list</h2>
         <p>All the workers on the construction.</p>
 
-        <table class="table table-striped table-hover table-danger mt-5">
+        <table class="table table-striped table-hover table-warning mt-5">
             <thead class="align-middle">
                 <tr>
-                    <th>No</th>
+                    <th>ID</th>
                     <th>Principal</th>
                     <th>Contractor</th>
                     <th>Kind</th>
@@ -30,7 +30,7 @@
             <tbody>
                 {% for job in page_object %}
                     <tr class="align-middle">
-                        <td>{{ forloop.counter0 | add:page_object.start_index }}</td>
+                        <td>{{ job.pk }}</td>
                         <td>{{ job.principal.get_full_name }}</td>
                         <td>{{ job.contractor.get_full_name }}</td>
                         <td>{{ job.get_kind_display | capfirst }}</td>
@@ -38,7 +38,7 @@
                         <td>{{ job.get_status_display | capfirst }}</td>
                         <td>{{ job.description }}</td>
                         <td>{{ job.km_from | km }}</td>
-                        <td>{{ job.km_to | km }}</td>
+                        <td>{% if job.km_to %}{{ job.km_to | km }}{% else %}-{% endif %}</td>
                         <td>{{ job.deadline | date:"m-d-Y" }}</td>
                         <td>{{ job.comments }}</td>
                         <td>{{ job.created | date:"d-m-Y H:i" }}</td>

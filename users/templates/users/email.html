@@ -42,7 +42,7 @@
             </div>
             <div class="email-content">
                 <p>Hello {{ user_name }},</p>
-                <p>{{ content }}</p>
+                <p>{{ content | safe }}</p>
                 <p>Have a nice day!</p>
             </div>
             <div class="email-footer">
