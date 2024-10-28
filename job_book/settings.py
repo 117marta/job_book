@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 import os
 from pathlib import Path
+from urllib.parse import urlunparse
 
 from django.contrib import messages
 
@@ -192,3 +193,9 @@ CACHES = {
 # Crispy forms
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
+
+
+# Base URL
+SCHEME = "http"
+NETLOC = "127.0.0.1:8000"
+BASE_URL = urlunparse((SCHEME, NETLOC, "", None, None, None))
