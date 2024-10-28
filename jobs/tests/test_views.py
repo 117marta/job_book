@@ -6,6 +6,7 @@ from django.contrib.messages import get_messages
 from django.core import mail
 from django.test import Client, override_settings, TestCase
 from django.urls import reverse
+from parameterized import parameterized
 
 from jobs.consts import (
     EMAIL_JOB_CHANGE_CONTRACTOR_SUBJECT,
@@ -167,6 +168,32 @@ class TestJobView(TestCase):
         # Assert
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, redirect_url)
+
+    @parameterized.expand(["contractor", "new_contractor"])
+    def test_get_check_if_the_fields_are_editable(self, contractor_type):
+        """
+        If user is not a Principal or the Contractor of the Job, all the fields should be disabled.
+        If user is a Principal or the Contractor of the Job, the contractor, status and comments should be editable.
+        """
+        # Arrange
+        contractor = getattr(self, contractor_type)
+        self.client.force_login(user=contractor)
+
+        # Act
+        response = self.client.get(path=self.url)
+        form = response.context["form"]
+
+        # Assert
+        self.assertEqual(response.status_code, 200)
+        match contractor_type:
+            case "contractor":
+                self.assertNotIn("disabled", form["contractor"].as_text())
+                self.assertNotIn("disabled", form["status"].as_text())
+                self.assertNotIn("disabled", form["comments"].as_textarea())
+            case "new_contractor":
+                self.assertIn("disabled", form["contractor"].as_text())
+                self.assertIn("disabled", form["status"].as_text())
+                self.assertIn("disabled", form["comments"].as_textarea())
 
     @mock.patch("jobs.views.send_email_with_celery")
     def test_update_a_job_and_send_emails(self, mock_email):

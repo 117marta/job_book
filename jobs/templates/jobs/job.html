@@ -16,7 +16,7 @@
             </div>
             <div class="card-body">
                 {% crispy form %}
-                <input type="submit" value="Submit" class="btn btn-secondary bg-gradient">
+                <input type="submit" value="Submit" class="btn btn-secondary bg-gradient" {% if not form.user_can_edit %}disabled{% endif %}>
             </div>
         </div>
     </form>

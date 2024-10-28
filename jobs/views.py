@@ -87,7 +87,7 @@ def job_create(request):
 @login_required(login_url="login")
 def job_view(request, job_pk):
     job = get_object_or_404(Job, pk=job_pk)
-    form = JobViewForm(data=request.POST or None, instance=job)
+    form = JobViewForm(data=request.POST or None, instance=job, user=request.user)
 
     if request.method == "POST":
         if form.is_valid():

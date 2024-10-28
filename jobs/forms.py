@@ -74,6 +74,7 @@ class JobCreateForm(forms.ModelForm):
 
 class JobViewForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
         self.fields["principal"].initial = self.instance
         self.fields["contractor"].queryset = User.objects.annotate(
@@ -89,6 +90,11 @@ class JobViewForm(forms.ModelForm):
         self.fields["km_to"].disabled = True
         self.fields["description"].disabled = True
         self.fields["deadline"].disabled = True
+
+        if not self.user_can_edit():
+            self.fields["contractor"].disabled = True
+            self.fields["status"].disabled = True
+            self.fields["comments"].disabled = True
 
         self.helper = FormHelper()
         self.helper.layout = Layout(
@@ -109,6 +115,9 @@ class JobViewForm(forms.ModelForm):
             Field("description", wrapper_class="col-md-12"),
             Field("comments", wrapper_class="col-md-12"),
         )
+
+    def user_can_edit(self):
+        return self.instance.principal == self.user or self.instance.contractor == self.user
 
     class Meta:
         model = Job
