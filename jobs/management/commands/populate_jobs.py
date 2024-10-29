@@ -17,11 +17,15 @@ class Command(BaseCommand):
     help = "Populates the database with jobs."
 
     def handle(self, *args, **options):
-        surveyors_pk = User.objects.filter(role=SURVEYOR).values_list("pk", flat=True)
-        subcontractors_pk = User.objects.filter(role=SUBCONTRACTOR).values_list("pk", flat=True)
-        principals_pk = User.objects.filter(role__in=GENERAL_CONTRACTOR).values_list(
+        surveyors_pk = User.objects.filter(is_active=True, role=SURVEYOR).values_list(
             "pk", flat=True
         )
+        subcontractors_pk = User.objects.filter(is_active=True, role=SUBCONTRACTOR).values_list(
+            "pk", flat=True
+        )
+        principals_pk = User.objects.filter(
+            is_active=True, role__in=GENERAL_CONTRACTOR
+        ).values_list("pk", flat=True)
 
         for _ in range(20):
             principal = User.objects.get(pk=choice(principals_pk))

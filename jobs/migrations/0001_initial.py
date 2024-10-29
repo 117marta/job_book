@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
                 ('km_to', models.DecimalField(blank=True, decimal_places=3, max_digits=7, null=True)),
                 ('deadline', models.DateField()),
                 ('comments', models.TextField(blank=True, max_length=512)),
-                ('status', models.CharField(choices=[('waiting', 'waiting'), ('accepted', 'accepted'), ('refused', 'refused'), ('making_documents', 'making documents'), ('ready_to_stake_out', 'ready to stake out'), ('ongoing', 'ongoing'), ('finished', 'finished'), ('closed', 'closed')], default='waiting', max_length=32)),
+                ('status', models.CharField(choices=[('waiting', 'waiting'), ('accepted', 'accepted'), ('refused', 'refused'), ('making_documents', 'making documents'), ('ready_to_stake_out', 'ready to stake out'), ('data_passed', 'data passed'), ('ongoing', 'ongoing'), ('finished', 'finished'), ('closed', 'closed')], default='waiting', max_length=32)),
                 ('created', models.DateTimeField(auto_now_add=True)),
                 ('contractor', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='jobs_contractor', to=settings.AUTH_USER_MODEL)),
                 ('principal', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='jobs_principal', to=settings.AUTH_USER_MODEL)),

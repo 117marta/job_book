@@ -14,6 +14,7 @@ class JobStatuses(models.TextChoices):
     REFUSED = "refused", "refused"
     MAKING_DOCUMENTS = "making_documents", "making documents"
     READY_TO_STAKE_OUT = "ready_to_stake_out", "ready to stake out"
+    DATA_PASSED = "data_passed", "data passed"
     ONGOING = "ongoing", "ongoing"
     FINISHED = "finished", "finished"
     CLOSED = "closed", "closed"
