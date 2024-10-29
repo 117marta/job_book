@@ -97,7 +97,12 @@ def log_out(request):
 def panel(request):
     user = request.user
     if user and user.is_authenticated:
-        return render(request=request, template_name="users/panel.html", context={"user": user})
+        jobs_principal = user.jobs_principal.all().order_by("-pk")
+        return render(
+            request=request,
+            template_name="users/panel.html",
+            context={"user": user, "jobs_principal": jobs_principal},
+        )
     else:
         messages.info(request, LOGIN_NECESSITY_MESSAGE)
         return redirect("home-page")

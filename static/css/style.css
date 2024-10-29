@@ -24,3 +24,11 @@ h1 {
 .tooltip.show {
     opacity: 1;
 }
+
+.jobs-principal {
+    background-color: lightpink;
+}
+
+.job-container {
+    background-color: hotpink;
+}
