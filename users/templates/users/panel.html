@@ -46,7 +46,6 @@
         <h2 class="mb-5">Jobs as a principal [{{ jobs_principal.count }}]</h2>
 
         {% for job in jobs_principal %}
-
             <div class="job-container border border-dark rounded-3 p-3 m-5">
                 <div class="row align-items-center my-3">
                     <div class="col-auto me-auto"><i class="bi bi-person-circle"></i> <strong>{{ job.contractor.get_full_name }}</strong></div>
@@ -62,13 +61,17 @@
                     <div><i class="bi bi-envelope"></i> <a href="{% url "jobs-job" job_pk=job.pk %}">Job number {{ job.pk }}</a></div>
                     <div class="text-muted">{{ job.description }}</div>
                 </div>
-                {% if job.comments %}
+
+                <button type="button" class="btn btn-default" onclick="jobs_info('{{ job.pk }}')">Show/hide more info</button>
+                <div id="jobs-more-info-{{ job.pk }}" style="display: none">
+                    {% if job.comments %}
+                        <div class="row my-3">
+                            <div class="col"><i class="bi bi-info-square"></i> {{ job.comments }}</div>
+                        </div>
+                    {% endif %}
                     <div class="row my-3">
-                        <div class="col"><i class="bi bi-info-square"></i> {{ job.comments }}</div>
+                        <div class="col"><i class="bi bi-brightness-alt-high"></i> {{ job.created | date:"d.m.Y H:i" }}</div>
                     </div>
-                {% endif %}
-                <div class="row my-3">
-                    <div class="col"><i class="bi bi-brightness-alt-high"></i> {{ job.created | date:"d.m.Y H:i" }}</div>
                 </div>
             </div>
         {% empty %}
