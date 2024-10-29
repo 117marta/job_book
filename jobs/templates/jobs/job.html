@@ -1,12 +1,17 @@
 {% extends "home_page/base.html" %}
-{% load job_filters %}
 {% load crispy_forms_tags %}
 
 
 {% block title %}{{ block.super }} Jobs{% endblock %}
 
 {% block content %}
-    <h2 class="ps-2">Update a job details to continue further works</h2>
+    <h2 class="ps-2">Job number {{ job.pk }} -
+        {% if form.user_can_edit %}
+            Update a job details to continue further works
+        {% else %}
+            The details
+        {% endif %}
+    </h2>
 
     <form method="post">
         {% csrf_token %}
@@ -16,7 +21,9 @@
             </div>
             <div class="card-body">
                 {% crispy form %}
-                <input type="submit" value="Submit" class="btn btn-secondary bg-gradient" {% if not form.user_can_edit %}disabled{% endif %}>
+                {% if form.user_can_edit %}
+                    <input type="submit" value="Submit" class="btn btn-secondary bg-gradient">
+                {% endif %}
             </div>
         </div>
     </form>

@@ -16,13 +16,13 @@
                     <th>ID</th>
                     <th>Principal</th>
                     <th>Contractor</th>
-                    <th>Kind</th>
-                    <th>Trade</th>
                     <th>Status</th>
+                    <th>Kind</th>
                     <th>Description</th>
+                    <th>Deadline</th>
                     <th>km from</th>
                     <th>km to</th>
-                    <th>Deadline</th>
+                    <th>Trade</th>
                     <th>Comments</th>
                     <th>Created</th>
                 </tr>
@@ -30,18 +30,22 @@
             <tbody>
                 {% for job in page_object %}
                     <tr class="align-middle">
-                        <td>{{ job.pk }}</td>
+                        <td><a href="{% url "jobs-job" job_pk=job.pk %}">{{ job.pk }}</a></td>
                         <td>{{ job.principal.get_full_name }}</td>
                         <td>{{ job.contractor.get_full_name }}</td>
+                        <td>
+                            <span class="badge rounded-pill {% if job.status == "waiting" %}bg-light text-dark{% elif job.status == "accepted" %}bg-primary{% elif job.status == "finished" %}bg-success{% elif job.status == "refused" %}bg-danger{% elif job.status == "closed" %}bg-dark{% else %}bg-info text-dark{% endif %}">
+                                {{ job.get_status_display | capfirst }}
+                            </span>
+                        </td>
                         <td>{{ job.get_kind_display | capfirst }}</td>
-                        <td><span class="badge bg-secondary" >{{ job.trade }}</span></td>
-                        <td>{{ job.get_status_display | capfirst }}</td>
                         <td>{{ job.description }}</td>
+                        <td>{{ job.deadline | date:"d.m.Y" }}</td>
                         <td>{{ job.km_from | km }}</td>
                         <td>{% if job.km_to %}{{ job.km_to | km }}{% else %}-{% endif %}</td>
-                        <td>{{ job.deadline | date:"m-d-Y" }}</td>
+                        <td><span class="badge bg-secondary" >{{ job.trade }}</span></td>
                         <td>{{ job.comments }}</td>
-                        <td>{{ job.created | date:"d-m-Y H:i" }}</td>
+                        <td>{{ job.created | date:"d.m.Y H:i" }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
