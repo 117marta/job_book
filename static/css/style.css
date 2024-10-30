@@ -26,9 +26,25 @@ h1 {
 }
 
 .jobs-principal {
-    background-color: lightpink;
+    background-color:   #fcd9c0 ;
 }
 
-.job-container {
-    background-color: hotpink;
+.jobs-contractor {
+    background-color:  #e6c8fb;
+}
+
+.jobs-default {
+    background-color:  #c4bdbd ;
+}
+
+.job-principal {
+    background-color:   #fdab6e ;
+}
+
+.job-contractor {
+    background-color:  #c371fb;
+}
+
+.job-default {
+    background-color:  #898585 ;
 }

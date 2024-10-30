@@ -5,9 +5,15 @@
 {% block title %}{{ block.super }} My Jobs{% endblock %}
 
 {% block content %}
-    <div class="container-xl jobs-principal rounded mt-5 p-3 border">
-        <h2 class="mb-5">Jobs as a Principal [{{ jobs.count }}]</h2>
-        <h5 class="mb-5">role: {{ role }}</h5>
+    <div class="container-xl jobs-{% if role %}{{ role }}{% else %}default{% endif %} rounded mt-5 p-3 border">
+        <h2 class="mb-5">
+            {% if role %}
+                Jobs as a {{ role | capfirst }} [{{ jobs.count }}]
+            {% else %}
+                Choose your role to show your jobs
+            {% endif %}
+        </h2>
+{#        <h5 class="mb-5">role: {{ role }}</h5>#}
 
         <div class="my-3">
             <h5>Click below to choose your role.</h5>
@@ -17,26 +23,34 @@
             </div>
         </div>
 
-        <div class="my-3">
-            <h5>Click one of the buttons to filter the jobs you want to see.</h5>
-            <div class="btn-group d-flex justify-content-center my-2" role="group" aria-label="Button groups">
-                <a href="{% url "jobs-my-jobs" status="waiting" %}" class="btn btn-light mx-1" role="button">Waiting</a>
-                <a href="{% url "jobs-my-jobs" status="accepted" %}" class="btn btn-primary mx-1" role="button">Accepted</a>
-                <a href="{% url "jobs-my-jobs" status="refused" %}" class="btn btn-danger mx-1" role="button">Refused</a>
-                <a href="{% url "jobs-my-jobs" status="in_progress" %}" class="btn btn-info mx-1" role="button">IN PROGRESS</a>
-                <a href="{% url "jobs-my-jobs" status="making_documents" %}" class="btn btn-info mx-1" role="button">Making documents</a>
-                <a href="{% url "jobs-my-jobs" status="ready_to_stake_out" %}" class="btn btn-info mx-1" role="button">Ready to stake out</a>
-                <a href="{% url "jobs-my-jobs" status="data_passed" %}" class="btn btn-info mx-1" role="button">Data passed</a>
-                <a href="{% url "jobs-my-jobs" status="ongoing" %}" class="btn btn-info mx-1" role="button">Ongoing</a>
-                <a href="{% url "jobs-my-jobs" status="finished" %}" class="btn btn-success mx-1" role="button">Finished</a>
-                <a href="{% url "jobs-my-jobs" status="closed" %}" class="btn btn-dark mx-1" role="button">Closed</a>
+        {% if role %}
+            <div class="my-3">
+                <h5>Click one of the buttons to filter the jobs you want to see.</h5>
+                <div class="btn-group d-flex justify-content-center my-2" role="group" aria-label="Button groups">
+                    <a href="{% url "jobs-my-jobs" status="waiting" %}" class="btn btn-light mx-1" role="button">Waiting</a>
+                    <a href="{% url "jobs-my-jobs" status="accepted" %}" class="btn btn-primary mx-1" role="button">Accepted</a>
+                    <a href="{% url "jobs-my-jobs" status="refused" %}" class="btn btn-danger mx-1" role="button">Refused</a>
+                    <a href="{% url "jobs-my-jobs" status="in_progress" %}" class="btn btn-info mx-1" role="button">IN PROGRESS</a>
+                    <a href="{% url "jobs-my-jobs" status="making_documents" %}" class="btn btn-info mx-1" role="button">Making documents</a>
+                    <a href="{% url "jobs-my-jobs" status="ready_to_stake_out" %}" class="btn btn-info mx-1" role="button">Ready to stake out</a>
+                    <a href="{% url "jobs-my-jobs" status="data_passed" %}" class="btn btn-info mx-1" role="button">Data passed</a>
+                    <a href="{% url "jobs-my-jobs" status="ongoing" %}" class="btn btn-info mx-1" role="button">Ongoing</a>
+                    <a href="{% url "jobs-my-jobs" status="finished" %}" class="btn btn-success mx-1" role="button">Finished</a>
+                    <a href="{% url "jobs-my-jobs" status="closed" %}" class="btn btn-dark mx-1" role="button">Closed</a>
+                </div>
             </div>
-        </div>
+        {% endif %}
 
         {% for job in jobs %}
-            <div class="job-container border border-dark rounded-3 p-3 m-5">
+            <div class="job-{% if role %}{{ role }}{% else %}default{% endif %} border border-dark rounded-3 p-3 m-5">
                 <div class="row align-items-center my-3">
-                    <div class="col-auto me-auto"><i class="bi bi-person-circle"></i> <strong>{{ job.contractor.get_full_name }}</strong></div>
+                    <div class="col-auto me-auto"><i class="bi bi-person-circle"></i> <strong>
+                        {% if role == "principal" %}
+                            {{ job.contractor.get_full_name }}
+                        {% else %}
+                            {{ job.principal.get_full_name }}
+                        {% endif %}
+                    </strong></div>
                     <div class="col-2"><i class="bi bi-flag-fill"></i> {{ job.get_kind_display | capfirst }}</div>
                     <div class="col-2"><i class="bi bi-gear"></i> {{ job.get_status_display | capfirst }}</div>
                     <div class="col-2"><i class="bi bi-calendar-check"></i> <strong>{{ job.deadline | date:"d.m.Y" }}</strong></div>
@@ -63,7 +77,7 @@
                 </div>
             </div>
         {% empty %}
-            <div class="job-container border border-dark rounded-3 p-3 m-5">
+            <div class="job-{% if role %}{{ role }}{% else %}default{% endif %} border border-dark rounded-3 p-3 m-5">
                 No jobs!
             </div>
         {% endfor %}
