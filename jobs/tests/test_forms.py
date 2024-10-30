@@ -141,7 +141,7 @@ class TestJobViewForm(TestCase):
                 }
 
         # Act
-        form = JobViewForm(instance=self.job, data=data)
+        form = JobViewForm(instance=self.job, data=data, user=self.principal)
         form.save()
 
         # Assert
