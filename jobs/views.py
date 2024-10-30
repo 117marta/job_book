@@ -121,3 +121,24 @@ def job_view(request, job_pk):
             return redirect("jobs-all")
 
     return render(request, "jobs/job.html", {"job": job, "form": form})
+
+
+@login_required(login_url="login")
+def my_jobs(request, status=JobStatuses.WAITING):
+    user = request.user
+    jobs = Job.objects.filter(principal=user).order_by("-pk")
+
+    if status == "in_progress":
+        jobs = jobs.filter(
+            principal=user,
+            status__in=[
+                JobStatuses.MAKING_DOCUMENTS,
+                JobStatuses.READY_TO_STAKE_OUT,
+                JobStatuses.DATA_PASSED,
+                JobStatuses.ONGOING,
+            ],
+        )
+    else:
+        jobs = jobs.filter(status=status)
+
+    return render(request, "jobs/my_jobs.html", {"jobs": jobs})

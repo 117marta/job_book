@@ -1,0 +1,62 @@
+{% extends "home_page/base.html" %}
+{% load job_filters %}
+
+
+{% block title %}{{ block.super }} Panel{% endblock %}
+
+{% block content %}
+    <div class="container-xl jobs-principal rounded mt-5 p-3 border">
+        <h2 class="mb-5">Jobs as a Principal [{{ jobs.count }}]</h2>
+        <h5 class="mb-5">Click one of the buttons to filter the jobs you want to see.</h5>
+
+        <div class="btn-group d-flex justify-content-center my-2" role="group" aria-label="Button groups">
+            <a href="{% url "jobs-my-jobs" status="waiting" %}" class="btn btn-light mx-1" role="button">Waiting</a>
+            <a href="{% url "jobs-my-jobs" status="accepted" %}" class="btn btn-primary mx-1" role="button">Accepted</a>
+            <a href="{% url "jobs-my-jobs" status="refused" %}" class="btn btn-danger mx-1" role="button">Refused</a>
+            <a href="{% url "jobs-my-jobs" status="in_progress" %}" class="btn btn-info mx-1" role="button">IN PROGRESS</a>
+            <a href="{% url "jobs-my-jobs" status="making_documents" %}" class="btn btn-info mx-1" role="button">Making documents</a>
+            <a href="{% url "jobs-my-jobs" status="ready_to_stake_out" %}" class="btn btn-info mx-1" role="button">Ready to stake out</a>
+            <a href="{% url "jobs-my-jobs" status="data_passed" %}" class="btn btn-info mx-1" role="button">Data passed</a>
+            <a href="{% url "jobs-my-jobs" status="ongoing" %}" class="btn btn-info mx-1" role="button">Ongoing</a>
+            <a href="{% url "jobs-my-jobs" status="finished" %}" class="btn btn-success mx-1" role="button">Finished</a>
+            <a href="{% url "jobs-my-jobs" status="closed" %}" class="btn btn-dark mx-1" role="button">Closed</a>
+        </div>
+
+        {% for job in jobs %}
+            <div class="job-container border border-dark rounded-3 p-3 m-5">
+                <div class="row align-items-center my-3">
+                    <div class="col-auto me-auto"><i class="bi bi-person-circle"></i> <strong>{{ job.contractor.get_full_name }}</strong></div>
+                    <div class="col-2"><i class="bi bi-flag-fill"></i> {{ job.get_kind_display | capfirst }}</div>
+                    <div class="col-2"><i class="bi bi-gear"></i> {{ job.get_status_display | capfirst }}</div>
+                    <div class="col-2"><i class="bi bi-calendar-check"></i> <strong>{{ job.deadline | date:"d.m.Y" }}</strong></div>
+                </div>
+                <div class="row align-items-center my-3 d-flex">
+                    <div class="col-3"><i class="bi bi-hammer"></i> <span class="badge bg-secondary" >{{ job.trade }}</span></div>
+                    <div class="col-3 offset-3"><i class="bi bi-arrow-left-right"></i> {{ job.km_from | km }}{% if job.km_to %} - {{ job.km_to | km }}{% endif %}</div>
+                </div>
+                <div class="row bg-light mx-auto my-3 py-2">
+                    <div><i class="bi bi-envelope"></i> <a href="{% url "jobs-job" job_pk=job.pk %}">Job number {{ job.pk }}</a></div>
+                    <div class="text-muted">{{ job.description }}</div>
+                </div>
+
+                <button type="button" class="btn btn-default" onclick="jobs_info('{{ job.pk }}')">Show/hide more info</button>
+                <div id="jobs-more-info-{{ job.pk }}" style="display: none">
+                    {% if job.comments %}
+                        <div class="row my-3">
+                            <div class="col"><i class="bi bi-info-square"></i> {{ job.comments }}</div>
+                        </div>
+                    {% endif %}
+                    <div class="row my-3">
+                        <div class="col"><i class="bi bi-brightness-alt-high"></i> {{ job.created | date:"d.m.Y H:i" }}</div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="job-container border border-dark rounded-3 p-3 m-5">
+                No jobs!
+            </div>
+        {% endfor %}
+    </div>
+
+
+{% endblock %}
