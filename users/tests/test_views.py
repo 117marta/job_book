@@ -6,6 +6,8 @@ from django.core import mail
 from django.test import Client, override_settings, TestCase
 from django.urls import reverse
 
+from jobs.consts import JobStatuses
+from jobs.tests.factories import JobFactory
 from trades.factories import TradeFactory
 from trades.models import ABBREVIATION_RAILWAY, Trade
 from users.const import (
@@ -159,6 +161,9 @@ class TestUserPanel(TestCase):
         self.client = Client()
 
     def test_get_not_logged_in_user_cannot_enter(self):
+        """
+        Not logged-in user is not allowed to enter the page.
+        """
         # Act
         response = self.client.get(self.url)
         response_messages = list(get_messages(response.wsgi_request))
@@ -169,6 +174,9 @@ class TestUserPanel(TestCase):
         )
 
     def test_get_logged_in_user_can_enter(self):
+        """
+        Logged-in user is allowed to enter the page.
+        """
         # Arrange
         self.client.force_login(user=self.user)
 
@@ -177,6 +185,59 @@ class TestUserPanel(TestCase):
 
         # Assert
         self.assertEqual(response.status_code, 200)
+
+    def test_get_jobs_statistics(self):
+        """
+        Check if the statistics displays the correct number of jobs depending on the role.
+        """
+        # Arrange
+        self.client.force_login(user=self.user)
+        JobFactory.create(principal=self.user, status=JobStatuses.WAITING)
+        JobFactory.create(principal=self.user, status=JobStatuses.ACCEPTED)
+        JobFactory.create(principal=self.user, status=JobStatuses.ACCEPTED)
+        JobFactory.create(principal=self.user, status=JobStatuses.READY_TO_STAKE_OUT)
+        JobFactory.create(principal=self.user, status=JobStatuses.DATA_PASSED)
+        JobFactory.create(principal=self.user, status=JobStatuses.CLOSED)
+        JobFactory.create(contractor=self.user, status=JobStatuses.WAITING)
+        JobFactory.create(contractor=self.user, status=JobStatuses.REFUSED)
+        JobFactory.create(contractor=self.user, status=JobStatuses.CLOSED)
+        expected_stats = {
+            "principal": {
+                "all": 6,
+                "statuses": {
+                    "waiting": 1,
+                    "accepted": 2,
+                    "refused": 0,
+                    "making documents": 0,
+                    "ready to stake out": 1,
+                    "data passed": 1,
+                    "ongoing": 0,
+                    "finished": 0,
+                    "closed": 1,
+                },
+            },
+            "contractor": {
+                "all": 3,
+                "statuses": {
+                    "waiting": 1,
+                    "accepted": 0,
+                    "refused": 1,
+                    "making documents": 0,
+                    "ready to stake out": 0,
+                    "data passed": 0,
+                    "ongoing": 0,
+                    "finished": 0,
+                    "closed": 1,
+                },
+            },
+        }
+
+        # Act
+        response = self.client.get(self.url)
+
+        # Assert
+        self.assertEqual(response.status_code, 200)
+        self.assertDictEqual(response.context["jobs_statistics"], expected_stats)
 
 
 class TestUsersAll(TestCase):
