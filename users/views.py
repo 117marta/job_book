@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.shortcuts import redirect, render
 
+from jobs.consts import JobStatuses
 from users.const import (
     ADMIN_NECESSITY_MESSAGE,
     EMAIL_ACCEPTANCE_CONTENT,
@@ -97,11 +98,27 @@ def log_out(request):
 def panel(request):
     user = request.user
     if user and user.is_authenticated:
-        jobs_principal = user.jobs_principal.all().order_by("-pk")
+        roles_dict = {
+            "principal": user.jobs_principal.all(),
+            "contractor": user.jobs_contractor.all(),
+        }
+        jobs_statistics = {}
+        for role, query in roles_dict.items():
+            result = {
+                "all": query.count(),
+                "statuses": {
+                    status.label: query.filter(status=status).count() for status in JobStatuses
+                },
+            }
+            jobs_statistics[role] = result
+
         return render(
             request=request,
             template_name="users/panel.html",
-            context={"user": user, "jobs_principal": jobs_principal},
+            context={
+                "user": user,
+                "jobs_statistics": jobs_statistics,
+            },
         )
     else:
         messages.info(request, LOGIN_NECESSITY_MESSAGE)

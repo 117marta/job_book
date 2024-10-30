@@ -5,7 +5,7 @@
 {% block title %}{{ block.super }} Panel{% endblock %}
 
 {% block content %}
-    <div class="container about-me rounded p-3" style="background-color:lightcyan;">
+    <div class="container about-me rounded p-3 mt-5" style="background-color:lightcyan;">
         <h2 class="mb-5">About me</h2>
 
         <div class="row py-2">
@@ -42,42 +42,72 @@
         </div>
     </div>
 
-    <div class="container-xl jobs-principal rounded mt-5 p-3 border">
-        <h2 class="mb-5">Jobs as a principal [{{ jobs_principal.count }}]</h2>
-
-        {% for job in jobs_principal %}
-            <div class="job-container border border-dark rounded-3 p-3 m-5">
-                <div class="row align-items-center my-3">
-                    <div class="col-auto me-auto"><i class="bi bi-person-circle"></i> <strong>{{ job.contractor.get_full_name }}</strong></div>
-                    <div class="col-2"><i class="bi bi-flag-fill"></i> {{ job.get_kind_display | capfirst }}</div>
-                    <div class="col-2"><i class="bi bi-gear"></i> {{ job.get_status_display | capfirst }}</div>
-                    <div class="col-2"><i class="bi bi-calendar-check"></i> <strong>{{ job.deadline | date:"d.m.Y" }}</strong></div>
-                </div>
-                <div class="row align-items-center my-3 d-flex">
-                    <div class="col-3"><i class="bi bi-hammer"></i> <span class="badge bg-secondary" >{{ job.trade }}</span></div>
-                    <div class="col-3 offset-3"><i class="bi bi-arrow-left-right"></i> {{ job.km_from | km }}{% if job.km_to %} - {{ job.km_to | km }}{% endif %}</div>
-                </div>
-                <div class="row bg-light mx-auto my-3 py-2">
-                    <div><i class="bi bi-envelope"></i> <a href="{% url "jobs-job" job_pk=job.pk %}">Job number {{ job.pk }}</a></div>
-                    <div class="text-muted">{{ job.description }}</div>
-                </div>
-
-                <button type="button" class="btn btn-default" onclick="jobs_info('{{ job.pk }}')">Show/hide more info</button>
-                <div id="jobs-more-info-{{ job.pk }}" style="display: none">
-                    {% if job.comments %}
-                        <div class="row my-3">
-                            <div class="col"><i class="bi bi-info-square"></i> {{ job.comments }}</div>
-                        </div>
-                    {% endif %}
-                    <div class="row my-3">
-                        <div class="col"><i class="bi bi-brightness-alt-high"></i> {{ job.created | date:"d.m.Y H:i" }}</div>
+    <div class="container jobs-statistics rounded p-3 mt-5" style="background-color:lightsteelblue;">
+        <div class="row">
+            <h2 class="mb-5">Jobs statistics</h2>
+            <div class="col-6">
+                <div class="container-xl jobs-principal rounded p-3 border border-dark shadow">
+                    <h2 class="mb-5">Jobs as a Principal</h2>
+                    <div>
+                        {% if jobs_statistics.principal.all %}
+                            <p>You have a total of <strong>{{ jobs_statistics.principal.all }}</strong> jobs as a Principal.</p>
+                            <div class="jobs-statistics my-4 bg-light d-flex justify-content-center w-50">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Status</th>
+                                            <th>Count</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for status, count in jobs_statistics.principal.statuses.items %}
+                                            <tr>
+                                                <td>{{ status | capfirst }}</td>
+                                                <td>{{ count }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <p>Click <a href="{% url "jobs-my-jobs" %}">here</a> to see the details.</p>
+                        {% else %}
+                            <p>You don't have any jobs.</p>
+                        {% endif %}
                     </div>
                 </div>
             </div>
-        {% empty %}
-            No jobs!
-        {% endfor %}
+
+            <div class="col-6">
+                <div class="container-xl jobs-contractor rounded p-3 border border-dark shadow">
+                    <h2 class="mb-5">Jobs as a Contractor</h2>
+                    <div>
+                        {% if jobs_statistics.contractor.all %}
+                            <p>You have a total of <strong>{{ jobs_statistics.contractor.all }}</strong> jobs as a Contractor.</p>
+                            <div class="jobs-statistics my-4 bg-light d-flex justify-content-center w-50">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Status</th>
+                                            <th>Count</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for status, count in jobs_statistics.contractor.statuses.items %}
+                                            <tr>
+                                                <td>{{ status | capfirst }}</td>
+                                                <td>{{ count }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <p>Click <a href="{% url "jobs-my-jobs" %}">here</a> to see the details.</p>
+                        {% else %}
+                            <p>You don't have any jobs.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-
-
 {% endblock %}
