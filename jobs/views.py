@@ -128,8 +128,10 @@ def job_view(request, job_pk):
 def my_jobs(request, status=JobStatuses.WAITING):
     user = request.user
     role = request.session.get("role", None)
-    jobs = Job.objects.all().order_by("-pk")
+    if not role:
+        return render(request, "jobs/my_jobs.html")
 
+    jobs = Job.objects.all().order_by("-pk")
     if role == JOB_ROLE_PRINCIPAL:
         jobs = jobs.filter(principal=user)
     else:

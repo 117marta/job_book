@@ -241,3 +241,108 @@ class TestJobView(TestCase):
                 ),
             ]
         )
+
+
+class TestMyJobsView(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.principal = UserFactory.create(is_active=True)
+        cls.contractor = UserFactory.create(is_active=True)
+        JobFactory.create(principal=cls.principal, status=JobStatuses.WAITING)
+        JobFactory.create(principal=cls.principal, status=JobStatuses.WAITING)
+        JobFactory.create(principal=cls.principal, status=JobStatuses.ACCEPTED)
+        JobFactory.create(principal=cls.principal, status=JobStatuses.DATA_PASSED)
+        JobFactory.create(principal=cls.principal, status=JobStatuses.DATA_PASSED)
+        JobFactory.create(principal=cls.principal, status=JobStatuses.DATA_PASSED)
+        JobFactory.create(principal=cls.principal, status=JobStatuses.FINISHED)
+        JobFactory.create(contractor=cls.contractor, status=JobStatuses.WAITING)
+        JobFactory.create(contractor=cls.contractor, status=JobStatuses.REFUSED)
+        JobFactory.create(contractor=cls.contractor, status=JobStatuses.MAKING_DOCUMENTS)
+        JobFactory.create(contractor=cls.contractor, status=JobStatuses.MAKING_DOCUMENTS)
+        JobFactory.create(contractor=cls.contractor, status=JobStatuses.READY_TO_STAKE_OUT)
+        JobFactory.create(contractor=cls.contractor, status=JobStatuses.DATA_PASSED)
+        JobFactory.create(contractor=cls.contractor, status=JobStatuses.ONGOING)
+        JobFactory.create(contractor=cls.contractor, status=JobStatuses.CLOSED)
+        JobFactory.create(
+            principal=cls.principal, contractor=cls.contractor, status=JobStatuses.ONGOING
+        )
+        JobFactory.create(
+            principal=cls.principal, contractor=cls.contractor, status=JobStatuses.MAKING_DOCUMENTS
+        )
+        cls.url = reverse("jobs-my-jobs")
+
+    def setUp(self):
+        self.client = Client()
+
+    def test_get_not_logged_in_user_cannot_enter(self):
+        """
+        Not logged-in user is not allowed to enter the page.
+        """
+        # Act
+        response = self.client.get(self.url)
+        redirect_url = f"{reverse('login')}?{urlencode({'next': self.url})}"
+
+        # Assert
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, redirect_url)
+
+    def test_get_user_see_no_jobs(self):
+        """
+        The user does not see the jobs until he/she selects a role.
+        """
+        # Arrange
+        self.client.force_login(user=self.principal)
+
+        # Act
+        response = self.client.get(self.url)
+
+        # Assert
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn("jobs", response.context)
+
+    @parameterized.expand(
+        [
+            ("principal", None, 2),
+            ("principal", "waiting", 2),
+            ("principal", "accepted", 1),
+            ("principal", "refused", 0),
+            ("principal", "making_documents", 1),
+            ("principal", "ready_to_stake_out", 0),
+            ("principal", "data_passed", 3),
+            ("principal", "ongoing", 1),
+            ("principal", "finished", 1),
+            ("principal", "closed", 0),
+            ("contractor", None, 1),
+            ("contractor", "waiting", 1),
+            ("contractor", "accepted", 0),
+            ("contractor", "refused", 1),
+            ("contractor", "making_documents", 3),
+            ("contractor", "ready_to_stake_out", 1),
+            ("contractor", "data_passed", 1),
+            ("contractor", "ongoing", 2),
+            ("contractor", "finished", 0),
+            ("contractor", "closed", 1),
+        ]
+    )
+    def test_get_user_see_waiting_jobs(self, role, status, count):
+        """
+        After the user chose a role - the jobs are visible.
+        The jobs are filtered by the role (principal/contractor) and also by the status.
+        """
+        # Arrange
+        user = getattr(self, role)
+        self.client.force_login(user=user)
+        session = self.client.session
+        session.update({"role": role})
+        session.save()
+
+        # Act
+        if status:
+            response = self.client.get(reverse("jobs-my-jobs", kwargs={"status": status}))
+        else:
+            response = self.client.get(self.url)
+
+        # Assert
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("jobs", response.context)
+        self.assertEqual(response.context["jobs"].count(), count)
