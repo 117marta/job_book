@@ -32,6 +32,8 @@ DEADLINE_FORM_ERROR = "A date from the past was given"
 # Views
 JOB_CREATE_SUCCESS_MESSAGE = "The job has been created!"
 JOB_SAVE_SUCCESS_MESSAGE = "The job has been saved!"
+JOB_ROLE_CONTRACTOR = "contractor"
+JOB_ROLE_PRINCIPAL = "principal"
 
 
 # E-mails

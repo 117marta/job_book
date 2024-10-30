@@ -12,6 +12,7 @@ from jobs.consts import (
     EMAIL_JOB_CREATE_CONTENT,
     EMAIL_JOB_CREATE_SUBJECT,
     JOB_CREATE_SUCCESS_MESSAGE,
+    JOB_ROLE_PRINCIPAL,
     JOB_SAVE_SUCCESS_MESSAGE,
     JOBS_PER_PAGE,
     JobStatuses,
@@ -126,7 +127,13 @@ def job_view(request, job_pk):
 @login_required(login_url="login")
 def my_jobs(request, status=JobStatuses.WAITING):
     user = request.user
-    jobs = Job.objects.filter(principal=user).order_by("-pk")
+    role = request.session.get("role", None)
+    jobs = Job.objects.all().order_by("-pk")
+
+    if role == JOB_ROLE_PRINCIPAL:
+        jobs = jobs.filter(principal=user)
+    else:
+        jobs = jobs.filter(contractor=user)
 
     if status == "in_progress":
         jobs = jobs.filter(
@@ -141,4 +148,9 @@ def my_jobs(request, status=JobStatuses.WAITING):
     else:
         jobs = jobs.filter(status=status)
 
-    return render(request, "jobs/my_jobs.html", {"jobs": jobs})
+    return render(request, "jobs/my_jobs.html", {"jobs": jobs, "role": role})
+
+
+def set_role_session(request, role_url=JOB_ROLE_PRINCIPAL):
+    request.session["role"] = role_url
+    return redirect("jobs-my-jobs")
