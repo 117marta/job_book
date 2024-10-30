@@ -138,8 +138,9 @@ def my_jobs(request, status=JobStatuses.WAITING):
         jobs = jobs.filter(contractor=user)
 
     if status == "in_progress":
+        role_filter = {role: user}
         jobs = jobs.filter(
-            principal=user,
+            **role_filter,
             status__in=[
                 JobStatuses.MAKING_DOCUMENTS,
                 JobStatuses.READY_TO_STAKE_OUT,
