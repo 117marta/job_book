@@ -6,3 +6,9 @@ function jobs_info(job_pk) {
         jobsMoreInfo.style.display = "none";
     }
 }
+
+
+const formJobUpdate = document.getElementById('form-job-update')
+function form_job_update_submit()  {
+    formJobUpdate.submit();
+}

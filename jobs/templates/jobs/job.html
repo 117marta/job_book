@@ -13,7 +13,7 @@
         {% endif %}
     </h2>
 
-    <form method="post">
+    <form method="post" id="form-job-update">
         {% csrf_token %}
         <div class="card mx-auto mt-5" style="width: 90%; background-color: lightgray">
             <div class="card-header bg-secondary bg-gradient">
@@ -22,10 +22,33 @@
             <div class="card-body">
                 {% crispy form %}
                 {% if form.user_can_edit %}
-                    <input type="submit" value="Submit" class="btn btn-secondary bg-gradient">
+                    <button type="button" class="btn btn-secondary bg-gradient" data-bs-toggle="modal" data-bs-target="#jobUpdateModal">Submit</button>
                 {% endif %}
             </div>
         </div>
     </form>
 
+    <div class="modal" tabindex="-1" id="jobUpdateModal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <h5 class="modal-title px-2">Modal title</h5>
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <p>Check that the details used to complete the update form are correct.</p>
+                    <p>No undo is provided!</p>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button onclick="form_job_update_submit()" type="submit" class="btn btn-primary" id="form-job-update">Update the job</button>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
