@@ -24,22 +24,19 @@ from users.tasks import send_email_with_celery
 
 @login_required(login_url="login")
 def jobs_all(request):
-    jobs = Job.objects.all().order_by("-created")
-    paginator = Paginator(jobs, per_page=JOBS_PER_PAGE)
-
     page_number = request.GET.get("page")
+    order_by = request.GET.get("order_by", "-created")
+    jobs = Job.objects.all().order_by(order_by)
+    paginator = Paginator(jobs, per_page=JOBS_PER_PAGE)
     page_object = paginator.get_page(page_number)
-    adjusted_elided_pages = paginator.get_elided_page_range(
-        number=page_object.number, on_each_side=2, on_ends=1
-    )
     return render(
         request=request,
         template_name="jobs/jobs_all.html",
         context={
-            "users": jobs,
+            "jobs": jobs,
             "page_object": page_object,
             "paginator": paginator,
-            "adjusted_elided_pages": adjusted_elided_pages,
+            "order_by": order_by,
         },
     )
 

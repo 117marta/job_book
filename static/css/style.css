@@ -48,3 +48,8 @@ h1 {
 .job-default {
     background-color:  #898585 ;
 }
+
+
+.nowrap {
+    white-space: nowrap;
+}

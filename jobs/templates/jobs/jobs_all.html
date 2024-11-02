@@ -12,20 +12,39 @@
 
         <table class="table table-striped table-hover table-warning mt-5">
             <thead class="align-middle">
-                <tr>
-                    <th>ID</th>
-                    <th>Principal</th>
-                    <th>Contractor</th>
-                    <th>Status</th>
-                    <th>Kind</th>
-                    <th>Description</th>
-                    <th>Deadline</th>
-                    <th>km from</th>
-                    <th>km to</th>
-                    <th>Trade</th>
-                    <th>Comments</th>
-                    <th>Created</th>
-                </tr>
+                {% with sort_ascending="bi bi-sort-alpha-down" sort_descending="bi bi-sort-alpha-down-alt" %}
+                    <tr>
+                        <th>
+                            <div class="nowrap">ID
+                                <a href="?order_by=pk"><i class="{{ sort_ascending }}"></i></a>
+                                <a href="?order_by=-pk"><i class="{{ sort_descending }}"></i></a>
+                            </div>
+                        </th>
+                        <th>Principal</th>
+                        <th>Contractor</th>
+                        <th>Status</th>
+                        <th>Kind</th>
+                        <th>
+                            <div class="nowrap">
+                                Description
+                                <a href="?order_by=description"><i class="{{ sort_ascending }}"></i></a>
+                                <a href="?order_by=-description"><i class="{{ sort_descending }}"></i></a>
+                            </div>
+                        </th>
+                        <th>
+                            <div class="nowrap">
+                                Deadline
+                                <a href="?order_by=deadline"><i class="{{ sort_ascending }}"></i></a>
+                                <a href="?order_by=-deadline"><i class="{{ sort_descending }}"></i></a>
+                            </div>
+                        </th>
+                        <th>km from</th>
+                        <th>km to</th>
+                        <th>Trade</th>
+                        <th>Comments</th>
+                        <th>Created</th>
+                    </tr>
+                {% endwith %}
             </thead>
             <tbody>
                 {% for job in page_object %}
@@ -51,35 +70,38 @@
             </tbody>
         </table>
 
-        <nav aria-label="Page navigation example">
-            <ul class="pagination justify-content-center">
-                <li class="page-item {% if not page_object.has_previous %}disabled{% endif %}">
-                    <a class="page-link" href="{% if page_object.has_previous %}?page={{ page_object.previous_page_number }}{% endif %}">◀️ Previous</a>
-                </li>
+        {% if jobs %}
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item {% if not page_object.has_previous %}disabled{% endif %}">
+                        <a class="page-link" href="{% if page_object.has_previous %}?page={{ page_object.previous_page_number }}&order_by={{ order_by }}{% endif %}">◀️ Previous</a>
+                    </li>
 
-                {% for page in adjusted_elided_pages %}
-                    {% if page_object.number == page %}
-                        <li class="page-item active">
-                            <a class="page-link">{{ page }}</a>
-                        </li>
-                    {% else %}
-                        {% if page == paginator.ELLIPSIS %}
-                            <li class="page-item">
-                                <span class="page-link">{{ paginator.ELLIPSIS }}</span>
+                    {% get_elided_page_range paginator page_object.number 2 1 as page_range %}
+                    {% for page_num in page_range %}
+                        {% if page_object.number == page_num %}
+                            <li class="page-item active">
+                                <a class="page-link">{{ page_num }}</a>
                             </li>
                         {% else %}
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ page }}">{{ page }}</a>
-                            </li>
+                            {% if page_num == paginator.ELLIPSIS %}
+                                <li class="page-item">
+                                    <span class="page-link">{{ paginator.ELLIPSIS }}</span>
+                                </li>
+                            {% else %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_num }}&order_by={{ order_by }}">{{ page_num }}</a>
+                                </li>
+                            {% endif %}
                         {% endif %}
-                    {% endif %}
-                {% endfor %}
+                    {% endfor %}
 
-                <li class="page-item {% if not page_object.has_next %}disabled{% endif %}">
-                    <a class="page-link" href="{% if page_object.has_next %}?page={{ page_object.next_page_number }}{% endif %}">Next ️▶️</a>
-                </li>
-            </ul>
-        </nav>
+                    <li class="page-item {% if not page_object.has_next %}disabled{% endif %}">
+                        <a class="page-link" href="{% if page_object.has_next %}?page={{ page_object.next_page_number }}&order_by={{ order_by }}{% endif %}">Next ️▶️</a>
+                    </li>
+                </ul>
+            </nav>
+        {% endif %}
     </div>
 
 {% endblock %}
