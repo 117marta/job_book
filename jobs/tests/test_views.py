@@ -35,6 +35,9 @@ class TestJobsAll(TestCase):
         self.client = Client()
 
     def test_get_not_logged_in_user_cannot_enter(self):
+        """
+        Not logged-in user is not allowed to enter the page.
+        """
         # Act
         response = self.client.get(self.url)
         redirect_url = f"{reverse('login')}?{urlencode({'next': self.url})}"
@@ -44,6 +47,9 @@ class TestJobsAll(TestCase):
         self.assertRedirects(response, redirect_url)
 
     def test_get_logged_in_user_can_enter(self):
+        """
+        Logged-in user is allowed to enter the page.
+        """
         # Arrange
         self.client.force_login(user=self.user)
 
@@ -53,7 +59,10 @@ class TestJobsAll(TestCase):
         # Assert
         self.assertEqual(response.status_code, 200)
 
-    def test_jobs_all_pagination(self):
+    def test_get_jobs_all_pagination(self):
+        """
+        Checks if a page is divided into smaller pages based on the JOBS_PER_PAGE.
+        """
         # Arrange
         self.client.force_login(user=self.user)
         jobs_count = JOBS_PER_PAGE + 1
@@ -67,6 +76,53 @@ class TestJobsAll(TestCase):
         self.assertEqual(response.context["paginator"].count, jobs_count)
         self.assertEqual(Job.objects.count(), jobs_count)
         self.assertEqual(response.context["paginator"].num_pages, 2)
+
+    @parameterized.expand(
+        [
+            "pk",
+            "-pk",
+            "description",
+            "-description",
+            "deadline",
+            "-deadline",
+        ]
+    )
+    def test_get_sort(self, field_name):
+        """
+        Checks if sorting works correctly depending on the chosen field and the sort type.
+        """
+        # Arrange
+        self.client.force_login(user=self.user)
+        job1 = JobFactory.create(
+            description="Test description", deadline=datetime.date(2024, 11, 2)
+        )
+        job2 = JobFactory.create(
+            description="XYZ description", deadline=datetime.date(2024, 10, 31)
+        )
+        job3 = JobFactory.create(description="ABC description", deadline=datetime.date(2024, 11, 1))
+
+        match field_name:
+            case "pk":
+                expected_jobs_pk = (job1.pk, job2.pk, job3.pk)
+            case "-pk":
+                expected_jobs_pk = (job3.pk, job2.pk, job1.pk)
+            case "description":
+                expected_jobs_pk = (job3.pk, job1.pk, job2.pk)
+            case "-description":
+                expected_jobs_pk = (job2.pk, job1.pk, job3.pk)
+            case "deadline":
+                expected_jobs_pk = (job2.pk, job3.pk, job1.pk)
+            case _:
+                expected_jobs_pk = (job1.pk, job3.pk, job2.pk)
+
+        # Act
+        response = self.client.get(f"{self.url}?order_by={field_name}")
+
+        # Assert
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            tuple(response.context["jobs"].values_list("pk", flat=True)), expected_jobs_pk
+        )
 
 
 class TestJobsCreate(TestCase):
