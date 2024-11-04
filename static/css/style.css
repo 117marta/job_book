@@ -1,6 +1,15 @@
 body {
-    background: green;
+    background: linear-gradient(210deg,#4b8f41,#5e4177,#d98b30,#6bdcbb,#a2e1);
+    background-size: 200% 200%;
+    animation: gradient-animation 60s linear infinite;
 }
+
+@keyframes gradient-animation {
+    0% {background-position: 0 50%}
+    50% {background-position: 100% 50%}
+    100% {background-position: 0 50%}
+}
+
 
 .carousel img {
     height: 700px;
@@ -8,6 +17,11 @@ body {
     object-fit: cover;
     object-position: center;
 }
+
+.carousel-caption {
+    background-color: rgb(100, 100, 100, 0.8);
+}
+
 
 .avatar-image {
     height: 50px;
@@ -46,8 +60,4 @@ body {
 
 .nowrap {
     white-space: nowrap;
-}
-
-.carousel-caption {
-    background-color: rgb(100, 100, 100, 0.8);
 }
