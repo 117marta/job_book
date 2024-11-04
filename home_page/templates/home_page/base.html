@@ -17,71 +17,69 @@
     </head>
     <body>
         <header>
-            <h1 style="text-align: center">Welcome on job book page!</h1>
-        </header>
-
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark py-4 mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="{% url "home-page" %}">Home page</a>
-                <ul class="navbar-nav me-auto">
-                    {% if not user.is_authenticated %}
-                        <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="{% url "registration" %}">Registration</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="{% url "login" %}">Log in</a>
-                        </li>
-                    {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="{% url "users-all" %}">Users list</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="{% url "jobs-all" %}">Jobs list</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="{% url "jobs-create" %}">Create a job</a>
-                        </li>
-                        {% if request.user.is_admin %}
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark py-4 mb-3">
+                <div class="container-fluid">
+                    <a class="navbar-brand" href="{% url "home-page" %}">Home page</a>
+                    <ul class="navbar-nav me-auto">
+                        {% if not user.is_authenticated %}
                             <li class="nav-item">
-                                <a class="nav-link" aria-current="page" href="{% url "accept-or-delete" %}">Unaccepted users</a>
+                                <a class="nav-link active" aria-current="page" href="{% url "registration" %}">Registration</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="{% url "login" %}">Log in</a>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="{% url "users-all" %}">Users list</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="{% url "jobs-all" %}">Jobs list</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="{% url "jobs-create" %}">Create a job</a>
+                            </li>
+                            {% if request.user.is_admin %}
+                                <li class="nav-item">
+                                    <a class="nav-link" aria-current="page" href="{% url "accept-or-delete" %}">Unaccepted users</a>
+                                </li>
+                            {% endif %}
                         {% endif %}
-                    {% endif %}
-                </ul>
-
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav ms-auto">
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                {% if user.is_authenticated %}
-                                    <img class="rounded-circle article-img me-2 avatar-image" src="{% if user.avatar %}{{ user.avatar.url }}{% else %}{{ default_avatar }}{% endif %}" alt="avatar">
-                                    <strong>{{ user.get_full_name }}</strong>
-                                {% else %}
-                                    Log in
-                                {% endif %}
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                {% if not user.is_authenticated %}
-                                    <li><a class="dropdown-item" href="{% url 'login' %}">Log in</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'registration' %}">Register</a></li>
-                                {% else %}
-                                    <li><a class="dropdown-item" href="{% url "panel" %}">Panel</a></li>
-                                    <li><a class="dropdown-item" href="{% url "jobs-my-jobs" %}">My jobs</a></li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" href="{% url 'logout' %}">Log out</a></li>
-                                {% endif %}
-                            </ul>
-                        </li>
-                        <li class="nav-item ms-2 d-flex align-items-center">
-                            <p class="nav navbar-text align-bottom">{% now "d-m-Y, H:i" %}</p>
-                        </li>
                     </ul>
+
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="navbar-nav ms-auto">
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    {% if user.is_authenticated %}
+                                        <img class="rounded-circle article-img me-2 avatar-image" src="{% if user.avatar %}{{ user.avatar.url }}{% else %}{{ default_avatar }}{% endif %}" alt="avatar">
+                                        <strong>{{ user.get_full_name }}</strong>
+                                    {% else %}
+                                        Log in
+                                    {% endif %}
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                    {% if not user.is_authenticated %}
+                                        <li><a class="dropdown-item" href="{% url 'login' %}">Log in</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'registration' %}">Register</a></li>
+                                    {% else %}
+                                        <li><a class="dropdown-item" href="{% url "panel" %}">Panel</a></li>
+                                        <li><a class="dropdown-item" href="{% url "jobs-my-jobs" %}">My jobs</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item" href="{% url 'logout' %}">Log out</a></li>
+                                    {% endif %}
+                                </ul>
+                            </li>
+                            <li class="nav-item ms-2 d-flex align-items-center">
+                                <p class="nav navbar-text align-bottom">{% now "d-m-Y, H:i" %}</p>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
-            </div>
-        </nav>
+            </nav>
+        </header>
 
         {% for message in messages %}
             <div class="alert alert-dismissible {{ message.tags }}" role="alert">

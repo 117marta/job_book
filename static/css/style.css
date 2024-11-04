@@ -2,11 +2,6 @@ body {
     background: green;
 }
 
-h1 {
-    color: purple;
-    text-shadow: 1px 1px yellow;
-}
-
 .carousel img {
     height: 700px;
     width: 100%;
@@ -49,7 +44,10 @@ h1 {
     background-color:  #898585 ;
 }
 
-
 .nowrap {
     white-space: nowrap;
+}
+
+.carousel-caption {
+    background-color: rgb(100, 100, 100, 0.8);
 }
