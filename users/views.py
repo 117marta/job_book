@@ -54,7 +54,6 @@ def registration(request):
 
             send_email_with_celery.delay(
                 user_pk=user.pk,
-                template_name="users/email.html",
                 subject=EMAIL_REGISTRATION_SUBJECT,
                 content=EMAIL_REGISTRATION_CONTENT,
             )
@@ -164,7 +163,6 @@ def accept_or_delete_inactive_users(request):
                 for user in User.objects.filter(pk__in=users_list):
                     send_email_with_celery.delay(
                         user_pk=user.pk,
-                        template_name="users/email.html",
                         subject=EMAIL_ACCEPTANCE_SUBJECT,
                         content=EMAIL_ACCEPTANCE_CONTENT,
                     )

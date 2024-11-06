@@ -71,7 +71,6 @@ def job_create(request):
 
             send_email_with_celery.delay(
                 user_pk=contractor.pk,
-                template_name="users/email.html",
                 subject=EMAIL_JOB_CREATE_SUBJECT,
                 content=EMAIL_JOB_CREATE_CONTENT.format(principal.get_full_name(), trade.name),
             )
@@ -97,7 +96,6 @@ def job_view(request, job_pk):
                 if "status" in form.changed_data:
                     send_email_with_celery.delay(
                         user_pk=principal.pk,
-                        template_name="users/email.html",
                         subject=EMAIL_JOB_CHANGE_STATUS_SUBJECT.format(job_pk),
                         content=EMAIL_JOB_CHANGE_STATUS_CONTENT.format(
                             job_pk=job_pk,
@@ -108,7 +106,6 @@ def job_view(request, job_pk):
                 if "contractor" in form.changed_data:
                     send_email_with_celery.delay(
                         user_pk=contractor.pk,
-                        template_name="users/email.html",
                         subject=EMAIL_JOB_CHANGE_CONTRACTOR_SUBJECT.format(job_pk),
                         content=EMAIL_JOB_CHANGE_CONTRACTOR_CONTENT.format(
                             job_pk=job_pk, trade=job.trade, url=job_url

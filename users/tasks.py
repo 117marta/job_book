@@ -6,7 +6,7 @@ from users.models import User
 
 
 @shared_task
-def send_email_with_celery(user_pk, template_name, subject, content):
+def send_email_with_celery(user_pk, subject, content, template_name="users/email.html"):
     user = User.objects.get(pk=user_pk)
     html_message = convert_to_html_content(
         template_name=template_name,

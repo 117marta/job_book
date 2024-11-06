@@ -20,7 +20,6 @@ def jobs_upcoming_deadline_contractor():
     for job in jobs:
         send_email_with_celery(
             user_pk=job.contractor.pk,
-            template_name="users/email.html",
             subject=EMAIL_JOB_UPCOMING_DEADLINE_SUBJECT.format(job.pk),
             content=EMAIL_JOB_UPCOMING_DEADLINE_CONTENT.format(job.pk),
         )

@@ -41,7 +41,6 @@ class TestJobsTasks(TestCase):
         if send_email:
             mock_email.assert_called_once_with(
                 user_pk=job.contractor.pk,
-                template_name="users/email.html",
                 subject=EMAIL_JOB_UPCOMING_DEADLINE_SUBJECT.format(job.pk),
                 content=EMAIL_JOB_UPCOMING_DEADLINE_CONTENT.format(job.pk),
             )

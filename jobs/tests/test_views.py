@@ -284,14 +284,12 @@ class TestJobView(TestCase):
                 # Change status -> e-mail to the Principal
                 mock.call(
                     user_pk=self.principal.pk,
-                    template_name="users/email.html",
                     subject=EMAIL_JOB_CHANGE_STATUS_SUBJECT.format(self.job.pk),
                     content=mock.ANY,
                 ),
                 # Change Contractor -> e-mail to the new Contractor
                 mock.call(
                     user_pk=self.new_contractor.pk,
-                    template_name="users/email.html",
                     subject=EMAIL_JOB_CHANGE_CONTRACTOR_SUBJECT.format(self.job.pk),
                     content=mock.ANY,
                 ),
