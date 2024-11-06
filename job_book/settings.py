@@ -14,6 +14,7 @@ import os
 from pathlib import Path
 from urllib.parse import urlunparse
 
+from celery.schedules import crontab
 from django.contrib import messages
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -48,6 +49,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'crispy_bootstrap5',
     'jobs',
+    'django_celery_beat',
 ]
 
 MIDDLEWARE = [
@@ -200,3 +202,14 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 SCHEME = "http"
 NETLOC = "127.0.0.1:8000"
 BASE_URL = urlunparse((SCHEME, NETLOC, "", None, None, None))
+
+
+# Celery beat scheduler
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
+CELERY_BEAT_SCHEDULE = {
+    'jobs_upcoming_contractor': {
+        'task': 'jobs.tasks.jobs_upcoming_contractor',
+        'schedule': crontab(hour="0", minute="15"),
+    },
+}

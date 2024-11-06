@@ -1,6 +1,5 @@
 import datetime
 from io import BytesIO
-from unittest.mock import patch
 
 from django.core.files.uploadedfile import InMemoryUploadedFile, SimpleUploadedFile
 from django.test import Client, TestCase

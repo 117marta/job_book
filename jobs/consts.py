@@ -43,3 +43,7 @@ EMAIL_JOB_CHANGE_STATUS_SUBJECT = "The job number {} has changed status"
 EMAIL_JOB_CHANGE_STATUS_CONTENT = "The job number {job_pk} has changed status to <strong>{status}</strong>. Check the details here <a href={url}>[CLICK]</a>"
 EMAIL_JOB_CHANGE_CONTRACTOR_SUBJECT = "The job number {} has been assigned to you"
 EMAIL_JOB_CHANGE_CONTRACTOR_CONTENT = "The job number {job_pk} in the {trade} trade has been assigned to you. Check the details here <a href={url}>[CLICK]</a>"
+EMAIL_JOB_UPCOMING_DEADLINE_SUBJECT = "Tomorrow is the deadline for the job number {}."
+EMAIL_JOB_UPCOMING_DEADLINE_CONTENT = (
+    "Tomorrow is the deadline for the job number {}. Remember to finish your work."
+)
