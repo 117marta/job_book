@@ -4,6 +4,8 @@ from jobs.consts import JobKinds, JobStatuses
 from trades.models import Trade
 from users.models import User
 
+JOBS_CONCLUDED_STATUSES = [JobStatuses.CLOSED, JobStatuses.FINISHED, JobStatuses.REFUSED]
+
 
 class Job(models.Model):
     principal = models.ForeignKey(User, on_delete=models.CASCADE, related_name="jobs_principal")

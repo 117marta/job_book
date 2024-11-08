@@ -212,6 +212,10 @@ CELERY_BEAT_SCHEDULE = {
         'task': 'jobs.tasks.jobs_upcoming_deadline_contractor',
         'schedule': crontab(hour="0", minute="15"),
     },
+    'jobs_overdue_deadline_principal': {
+        'task': 'jobs.tasks.jobs_overdue_deadline_principal',
+        'schedule': crontab(hour="0", minute="30"),
+    },
 }
 
 # Login URL

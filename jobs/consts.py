@@ -47,3 +47,5 @@ EMAIL_JOB_UPCOMING_DEADLINE_SUBJECT = "Tomorrow is the deadline for the job numb
 EMAIL_JOB_UPCOMING_DEADLINE_CONTENT = (
     "Tomorrow is the deadline for the job number {}. Remember to finish your work."
 )
+EMAIL_JOB_OVERDUE_DEADLINE_SUBJECT = "Your job number {} has not been completed."
+EMAIL_JOB_OVERDUE_DEADLINE_CONTENT = "The deadline for the job number {} has passed and it not has been completed. Contact the Contractor to arrange the details."
