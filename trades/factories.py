@@ -5,6 +5,10 @@ from trades.models import ALL_TRADES, Trade
 
 
 class TradeFactory(factory.django.DjangoModelFactory):
+    """
+    Create a Trade Factory object for the tests with pre-defined values.
+    """
+
     name = factory.Faker("sentence", nb_words=3)
     abbreviation = FuzzyChoice(ALL_TRADES)
     slug = factory.Faker("slug")

@@ -7,6 +7,10 @@ from users.models import ROLES, User
 
 
 class UserFactory(factory.django.DjangoModelFactory):
+    """
+    Create a User Factory object for the tests with pre-defined values.
+    """
+
     password = factory.Faker("password")
     first_name = factory.Faker("name")
     last_name = factory.Faker("last_name")

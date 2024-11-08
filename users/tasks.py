@@ -7,6 +7,14 @@ from users.models import User
 
 @shared_task
 def send_email_with_celery(user_pk, subject, content, template_name="users/email.html"):
+    """
+    Send an email as an asynchronous task that runs independently of Django app.
+
+    :param int user_pk: a user pk
+    :param str subject: a subject of an e-mail
+    :param str content: a content of an e-mail
+    :param str template_name: a template name of an e-mail
+    """
     user = User.objects.get(pk=user_pk)
     html_message = convert_to_html_content(
         template_name=template_name,

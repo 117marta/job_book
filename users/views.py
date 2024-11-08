@@ -27,6 +27,13 @@ from users.tasks import send_email_with_celery
 
 
 def registration(request):
+    """
+    Allow to register a new user.
+
+    :template: users/registration.html
+    :param request: the request object
+    :return: redirects to the `home-page` page
+    """
     form = RegistrationForm(data=request.POST or None, files=request.FILES or None)
 
     if request.method == "POST":
@@ -66,6 +73,13 @@ def registration(request):
 
 
 def log_in(request):
+    """
+    Log in a user.
+
+    :template: users/login.html
+    :param request: the request object
+    :return: redirects to the `home-page` page
+    """
     form = LoginForm(request.POST or None)
     next_url = request.GET.get("next")
 
@@ -89,12 +103,25 @@ def log_in(request):
 
 @login_required(login_url="login")
 def log_out(request):
+    """
+    Log out a user.
+
+    :param request: the request object
+    :return: redirects to the home page.
+    """
     logout(request)
     messages.success(request, LOGOUT_SUCCESS_MESSAGE)
     return redirect("home-page")
 
 
 def panel(request):
+    """
+    Display a user details and his job statistics.
+
+    :template: users/panel.html
+    :param request: the request object
+    :return: the request response - `panel` page
+    """
     user = request.user
     if user and user.is_authenticated:
         roles_dict = {
@@ -126,6 +153,13 @@ def panel(request):
 
 @login_required(login_url="login")
 def users_all(request):
+    """
+    Display all users as a table.
+
+    :template: users/users_all.html
+    :param request: the request object
+    :return: the request response - `users-all` page
+    """
     users = User.objects.all().order_by("last_name", "first_name")
     paginator = Paginator(users, per_page=USERS_OBJECTS_PER_PAGE)
 
@@ -148,6 +182,13 @@ def users_all(request):
 
 @login_required(login_url="login")
 def accept_or_delete_inactive_users(request):
+    """
+    Display all inactive users for acceptance or deletion.
+
+    :template: users/accept_or_delete.html
+    :param request: the request object
+    :return: the request response - `accept-or-delete` page
+    """
     if not request.user.is_admin:
         messages.error(request, ADMIN_NECESSITY_MESSAGE)
         return redirect("home-page")

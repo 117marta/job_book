@@ -250,6 +250,9 @@ class TestUsersAll(TestCase):
         self.client = Client()
 
     def test_get_not_logged_in_user_cannot_enter(self):
+        """
+        Not logged-in user is not allowed to enter the page.
+        """
         # Act
         response = self.client.get(self.url)
         redirect_url = f"{reverse('login')}?{urlencode({'next': self.url})}"
@@ -259,6 +262,9 @@ class TestUsersAll(TestCase):
         self.assertRedirects(response, redirect_url)
 
     def test_get_logged_in_user_can_enter(self):
+        """
+        Logged-in user is allowed to enter the page.
+        """
         # Arrange
         self.client.force_login(user=self.user)
 
@@ -269,6 +275,9 @@ class TestUsersAll(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_users_all_pagination(self):
+        """
+        Checks if a page is divided into smaller pages based on the USERS_OBJECTS_PER_PAGE.
+        """
         # Arrange
         self.client.force_login(user=self.user)
         UserFactory.create_batch(size=20)
@@ -296,6 +305,9 @@ class TestAcceptOrDelete(TestCase):
         self.client = Client()
 
     def test_get_not_logged_in_user_cannot_enter(self):
+        """
+        Not logged-in user is not allowed to enter the page.
+        """
         # Act
         response = self.client.get(self.url)
         redirect_url = f"{reverse('login')}?{urlencode({'next': self.url})}"
@@ -305,6 +317,9 @@ class TestAcceptOrDelete(TestCase):
         self.assertRedirects(response, redirect_url)
 
     def test_get_not_admin_user_cannot_enter(self):
+        """
+        Logged-in user is not allowed to enter the page.
+        """
         # Arrange
         self.client.force_login(user=self.user_active)
 
@@ -320,6 +335,9 @@ class TestAcceptOrDelete(TestCase):
         self.assertEqual(ADMIN_NECESSITY_MESSAGE, response_messages[0].message)
 
     def test_get_admin_user_can_enter(self):
+        """
+        An admin user is allowed to enter the page.
+        """
         # Arrange
         self.client.force_login(user=self.user_admin)
 
@@ -331,6 +349,9 @@ class TestAcceptOrDelete(TestCase):
 
     @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
     def test_post_action_accept_should_accept_users_and_send_an_email(self):
+        """
+        An admin user can accept an inactive users. After this action an e-mail is sent.
+        """
         # Arrange
         self.client.force_login(user=self.user_admin)
         users_count = User.objects.count()
@@ -353,6 +374,9 @@ class TestAcceptOrDelete(TestCase):
         self.assertEqual(set([mail.subject for mail in mail.outbox]), {EMAIL_ACCEPTANCE_SUBJECT})
 
     def test_post_action_delete_should_delete_users(self):
+        """
+        An admin user can delete an inactive users. After this action an e-mail is sent.
+        """
         # Arrange
         self.client.force_login(user=self.user_admin)
         users_count = User.objects.count()

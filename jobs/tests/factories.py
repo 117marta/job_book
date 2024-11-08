@@ -10,6 +10,10 @@ from users.tests.factories import UserFactory
 
 
 class JobFactory(factory.django.DjangoModelFactory):
+    """
+    Create a Job Factory object for the tests with pre-defined values.
+    """
+
     principal = factory.SubFactory(UserFactory)
     contractor = factory.SubFactory(UserFactory)
     kind = FuzzyChoice(JobKinds)

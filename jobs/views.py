@@ -24,6 +24,13 @@ from users.tasks import send_email_with_celery
 
 @login_required(login_url="login")
 def jobs_all(request):
+    """
+    Display all jobs as a table.
+
+    :template: jobs/jobs_all.html
+    :param request: the request object
+    :return: the request response - `jobs-all` page
+    """
     page_number = request.GET.get("page")
     order_by = request.GET.get("order_by", "-created")
     jobs = Job.objects.all().order_by(order_by)
@@ -43,6 +50,13 @@ def jobs_all(request):
 
 @login_required(login_url="login")
 def job_create(request):
+    """
+    Create a new order in the database.
+
+    :template: jobs/create.html
+    :param request: the request object
+    :return: redirects to the `jobs-all` page
+    """
     form = JobCreateForm(data=request.POST or None, instance=request.user)
 
     if request.method == "POST":
@@ -83,6 +97,14 @@ def job_create(request):
 
 @login_required(login_url="login")
 def job_view(request, job_pk):
+    """
+    Display details of a specific job.
+
+    :template: jobs/job.html
+    :param request: the request object
+    :param int job_pk: a job pk
+    :return: redirects to the `jobs-all` page
+    """
     job = get_object_or_404(Job, pk=job_pk)
     form = JobViewForm(data=request.POST or None, instance=job, user=request.user)
 
@@ -120,6 +142,14 @@ def job_view(request, job_pk):
 
 @login_required(login_url="login")
 def my_jobs(request, status=JobStatuses.WAITING):
+    """
+    Display user jobs.
+
+    :template: jobs/my_jobs.html
+    :param request: the request object
+    :param str status: a status of the job
+    :return: the request response - `jobs-my-jobs` page
+    """
     user = request.user
     role = request.session.get("role", None)
     if not role:
@@ -149,5 +179,12 @@ def my_jobs(request, status=JobStatuses.WAITING):
 
 
 def set_role_session(request, role_url=JOB_ROLE_PRINCIPAL):
+    """
+    Sets the user role (principal/contractor) in the session.
+
+    :param request: the request object
+    :param str role_url: a user role
+    :return: redirects to the `jobs-my-jobs` page
+    """
     request.session["role"] = role_url
     return redirect("jobs-my-jobs")
