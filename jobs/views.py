@@ -22,7 +22,7 @@ from jobs.models import Job
 from users.tasks import send_email_with_celery
 
 
-@login_required(login_url="login")
+@login_required
 def jobs_all(request):
     """
     Display all jobs as a table.
@@ -48,7 +48,7 @@ def jobs_all(request):
     )
 
 
-@login_required(login_url="login")
+@login_required
 def job_create(request):
     """
     Create a new order in the database.
@@ -95,10 +95,10 @@ def job_create(request):
     return render(request=request, template_name="jobs/create.html", context={"form": form})
 
 
-@login_required(login_url="login")
+@login_required
 def job_view(request, job_pk):
     """
-    Display details of a specific job.
+    Display the details of a specific job.
 
     :template: jobs/job.html
     :param request: the request object
@@ -140,7 +140,7 @@ def job_view(request, job_pk):
     return render(request, "jobs/job.html", {"job": job, "form": form})
 
 
-@login_required(login_url="login")
+@login_required
 def my_jobs(request, status=JobStatuses.WAITING):
     """
     Display user jobs.

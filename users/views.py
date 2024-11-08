@@ -101,7 +101,7 @@ def log_in(request):
     return render(request, "users/login.html", {"form": form})
 
 
-@login_required(login_url="login")
+@login_required
 def log_out(request):
     """
     Log out a user.
@@ -151,7 +151,7 @@ def panel(request):
         return redirect("home-page")
 
 
-@login_required(login_url="login")
+@login_required
 def users_all(request):
     """
     Display all users as a table.
@@ -180,7 +180,7 @@ def users_all(request):
     )
 
 
-@login_required(login_url="login")
+@login_required
 def accept_or_delete_inactive_users(request):
     """
     Display all inactive users for acceptance or deletion.
