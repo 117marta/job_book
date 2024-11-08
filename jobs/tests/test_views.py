@@ -190,6 +190,7 @@ class TestJobsCreate(TestCase):
         self.assertEqual(len(response_messages), 1)
         self.assertIn("success", response_messages[0].tags)
         self.assertEqual(JOB_CREATE_SUCCESS_MESSAGE, response_messages[0].message)
+        self.assertTrue(Job.objects.filter(**data).exists())
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, EMAIL_JOB_CREATE_SUBJECT)
 

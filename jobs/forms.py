@@ -17,8 +17,9 @@ class JobModelChoiceField(forms.ModelChoiceField):
 
 class JobCreateForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
-        self.fields["principal"].initial = self.instance
+        self.fields["principal"].initial = self.user
         self.fields["contractor"].queryset = User.objects.annotate(
             match_order=Case(
                 When(role__iexact=SURVEYOR, then=Value(0)),

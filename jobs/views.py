@@ -51,37 +51,20 @@ def jobs_all(request):
 @login_required
 def job_create(request):
     """
-    Create a new order in the database.
+    Create a new job in the database.
 
     :template: jobs/create.html
     :param request: the request object
     :return: redirects to the `jobs-all` page
     """
-    form = JobCreateForm(data=request.POST or None, instance=request.user)
+    form = JobCreateForm(data=request.POST or None, user=request.user)
 
     if request.method == "POST":
         if form.is_valid():
             principal = form.cleaned_data["principal"]
             contractor = form.cleaned_data["contractor"]
-            kind = form.cleaned_data["kind"]
             trade = form.cleaned_data["trade"]
-            description = form.cleaned_data["description"]
-            km_from = form.cleaned_data["km_from"]
-            km_to = form.cleaned_data["km_to"]
-            deadline = form.cleaned_data["deadline"]
-            comments = form.cleaned_data["comments"]
-
-            Job.objects.create(
-                principal=principal,
-                contractor=contractor,
-                kind=kind,
-                trade=trade,
-                description=description,
-                km_from=km_from,
-                km_to=km_to,
-                deadline=deadline,
-                comments=comments,
-            )
+            form.save()
 
             send_email_with_celery.delay(
                 user_pk=contractor.pk,
