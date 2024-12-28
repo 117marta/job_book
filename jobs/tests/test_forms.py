@@ -1,5 +1,6 @@
 import datetime
 
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from parameterized import parameterized
 
@@ -28,6 +29,11 @@ class TestJobCreateForm(TestCase):
             "deadline": datetime.date.today() + datetime.timedelta(days=3),
             "comments": "Test comments",
         }
+        cls.file = SimpleUploadedFile(
+            name="test_file.pdf",
+            content=b"Test content",
+            content_type="application/pdf",
+        )
 
     def test_create_a_job_correct_data(self):
         """
@@ -91,6 +97,19 @@ class TestJobCreateForm(TestCase):
         else:
             self.assertFalse(form.is_valid())
             self.assertEqual(expected_errors, form.errors)
+
+    def test_create_a_job_with_a_file(self):
+        """
+        Test should pass when uploading a file.
+        """
+        # Arrange
+        self.data.update(file=self.file)
+
+        # Act
+        form = JobCreateForm(data=self.data)
+
+        # Assert
+        self.assertTrue(form.is_valid())
 
 
 class TestJobViewForm(TestCase):

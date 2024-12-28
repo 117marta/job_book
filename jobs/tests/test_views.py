@@ -4,6 +4,7 @@ from urllib.parse import urlencode
 
 from django.contrib.messages import get_messages
 from django.core import mail
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, override_settings, TestCase
 from django.urls import reverse
 from parameterized import parameterized
@@ -132,6 +133,11 @@ class TestJobsCreate(TestCase):
         cls.principal = UserFactory.create(is_active=True, role=SITE_MANAGER)
         cls.surveyor = UserFactory.create(is_active=True, role=SURVEYOR)
         cls.trade = TradeFactory.create()
+        cls.file = SimpleUploadedFile(
+            name="test_file.jpg",
+            content=b"Test content",
+            content_type="image/jpeg",
+        )
 
     def setUp(self):
         self.client = Client()
@@ -168,7 +174,7 @@ class TestJobsCreate(TestCase):
         """
         # Arrange
         self.client.force_login(user=self.principal)
-        data = {
+        job_data = {
             "principal": self.principal.pk,
             "contractor": self.surveyor.pk,
             "kind": JobKinds.STAKING,
@@ -179,6 +185,8 @@ class TestJobsCreate(TestCase):
             "deadline": datetime.date.today() + datetime.timedelta(days=3),
             "comments": "On-site contact with Jan Kowalski: 500600700",
         }
+        file_data = {"file": self.file}
+        data = job_data | file_data
 
         # Act
         response = self.client.post(path=self.url, data=data)
@@ -190,7 +198,10 @@ class TestJobsCreate(TestCase):
         self.assertEqual(len(response_messages), 1)
         self.assertIn("success", response_messages[0].tags)
         self.assertEqual(JOB_CREATE_SUCCESS_MESSAGE, response_messages[0].message)
-        self.assertTrue(Job.objects.filter(**data).exists())
+        self.assertEqual(Job.objects.count(), 1)
+        self.assertTrue(Job.objects.filter(**job_data).exists())
+        job_file = Job.objects.last().get_job_files
+        self.assertEqual(job_file.count(), 1)
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, EMAIL_JOB_CREATE_SUBJECT)
 
