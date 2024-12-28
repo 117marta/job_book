@@ -21,6 +21,18 @@
             </div>
             <div class="card-body">
                 {% crispy form %}
+                <div class="job_files mb-3 col-md-12">
+                    <div><strong>Job files</strong></div>
+                    <div>
+                        {% if attachments %}
+                            {% for attachment in attachments %}
+                                <a href="{{ MEDIA_URL }}{{ attachment.file }}" download>{{ attachment.file_basename }} <i class="bi bi-cloud-download-fill"></i></a>
+                            {% endfor %}
+                        {% else %}
+                            No file(s).
+                        {% endif %}
+                    </div>
+                </div>
                 {% if form.user_can_edit %}
                     <button type="button" class="btn btn-secondary bg-gradient" data-bs-toggle="modal" data-bs-target="#jobUpdateModal">Submit</button>
                 {% endif %}

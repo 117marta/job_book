@@ -98,6 +98,7 @@ def job_view(request, job_pk):
     """
     job = get_object_or_404(Job, pk=job_pk)
     form = JobViewForm(data=request.POST or None, instance=job, user=request.user)
+    attachments = job.get_job_files
 
     if request.method == "POST":
         if form.is_valid():
@@ -128,7 +129,7 @@ def job_view(request, job_pk):
             messages.success(request, JOB_SAVE_SUCCESS_MESSAGE)
             return redirect("jobs-all")
 
-    return render(request, "jobs/job.html", {"job": job, "form": form})
+    return render(request, "jobs/job.html", {"job": job, "form": form, "attachments": attachments})
 
 
 @login_required

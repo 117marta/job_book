@@ -94,6 +94,10 @@ class FileBase(models.Model):
     def get_path(self, name):
         raise NotImplementedError("Subclasses of FileBase must provide a `get_path` method!")
 
+    @property
+    def file_basename(self):
+        return os.path.basename(self.file.name)
+
     class Meta:
         abstract = True
 

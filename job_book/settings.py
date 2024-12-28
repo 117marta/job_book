@@ -76,6 +76,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'home_page.context_processors.default_avatar',
+                'django.template.context_processors.media',
             ],
         },
     },
