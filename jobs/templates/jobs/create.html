@@ -7,7 +7,7 @@
 {% block content %}
     <h2 class="ps-2">Create a new job</h2>
 
-    <form method="post">
+    <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="card mx-auto mt-5" style="width: 80%; background-color: khaki">
             <div class="card-header bg-warning bg-gradient">
@@ -15,6 +15,10 @@
             </div>
             <div class="card-body">
                 {% crispy form %}
+                {% crispy job_file_form %}
+            </div>
+            <div class="m-3">
+                <button type="submit" class="btn btn-warning bg-gradient">Create a job</button>
             </div>
         </div>
     </form>

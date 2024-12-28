@@ -17,8 +17,8 @@ from jobs.consts import (
     JOBS_PER_PAGE,
     JobStatuses,
 )
-from jobs.forms import JobCreateForm, JobViewForm
-from jobs.models import Job
+from jobs.forms import JobCreateForm, JobFileForm, JobViewForm
+from jobs.models import Job, JobFile
 from users.tasks import send_email_with_celery
 
 
@@ -51,20 +51,24 @@ def jobs_all(request):
 @login_required
 def job_create(request):
     """
-    Create a new job in the database.
+    Create a new job and a job file in the database.
 
     :template: jobs/create.html
     :param request: the request object
     :return: redirects to the `jobs-all` page
     """
     form = JobCreateForm(data=request.POST or None, user=request.user)
+    job_file_form = JobFileForm(data=request.POST or None, files=request.FILES or None)
 
     if request.method == "POST":
-        if form.is_valid():
+        if form.is_valid() and job_file_form.is_valid():
             principal = form.cleaned_data["principal"]
             contractor = form.cleaned_data["contractor"]
             trade = form.cleaned_data["trade"]
             form.save()
+
+            if files := job_file_form.cleaned_data.get("file"):
+                JobFile.objects.create(file=files, content_object=form.instance)
 
             send_email_with_celery.delay(
                 user_pk=contractor.pk,
@@ -75,7 +79,11 @@ def job_create(request):
             messages.success(request, JOB_CREATE_SUCCESS_MESSAGE)
             return redirect("jobs-all")
 
-    return render(request=request, template_name="jobs/create.html", context={"form": form})
+    return render(
+        request=request,
+        template_name="jobs/create.html",
+        context={"form": form, "job_file_form": job_file_form},
+    )
 
 
 @login_required

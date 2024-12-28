@@ -1,3 +1,7 @@
+import os
+
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
 from jobs.consts import JobKinds, JobStatuses
@@ -56,3 +60,47 @@ class Job(models.Model):
     @property
     def is_closed(self):
         return self.status == JobStatuses.CLOSED
+
+    @property
+    def get_job_files(self):
+        return JobFile.objects.filter(content_type__model="job", object_id=self.pk)
+
+    @property
+    def has_attachments(self):
+        return self.get_job_files.exists()
+
+
+def job_file_directory(instance, filename):
+    get_path = getattr(instance, "get_path")
+    return get_path(filename)
+
+
+class FileBase(models.Model):
+    file = models.FileField(upload_to=job_file_directory, max_length=1024, blank=True)
+    uploaded = models.DateTimeField(auto_now_add=True)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, default="")
+    object_id = models.PositiveIntegerField(default=None, null=True)
+    content_object = GenericForeignKey(ct_field="content_type", fk_field="object_id")
+    file_name = ""
+    last_download = models.DateTimeField(blank=True, null=True)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not hasattr(self, "file_name"):
+            raise NotImplementedError(
+                "Subclasses of FileBase must provide a `file_name` attribute!"
+            )
+
+    def get_path(self, name):
+        raise NotImplementedError("Subclasses of FileBase must provide a `get_path` method!")
+
+    class Meta:
+        abstract = True
+
+
+class JobFile(FileBase):
+    file_name = "jobfiles"
+
+    def get_path(self, name):
+        path = os.path.join(self.file_name, f"job_{self.object_id:06d}")
+        return os.path.join(path, name)

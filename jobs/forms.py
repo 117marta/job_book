@@ -1,12 +1,12 @@
 import datetime
 
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Div, Field, Layout, Submit
+from crispy_forms.layout import Div, Field, Layout
 from django import forms
 from django.db.models import Case, Value, When
 
 from jobs.consts import DEADLINE_FORM_ERROR, KM_HELP_TEXT
-from jobs.models import Job
+from jobs.models import Job, JobFile
 from users.models import SURVEYOR, User
 
 
@@ -29,6 +29,8 @@ class JobCreateForm(forms.ModelForm):
         self.fields["km_from"].help_text = self.fields["km_to"].help_text = KM_HELP_TEXT
 
         self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.disable_csrf = True
         self.helper.layout = Layout(
             Div(
                 Field("principal", wrapper_class="col-md-6"),
@@ -51,7 +53,7 @@ class JobCreateForm(forms.ModelForm):
                 Field("comments", wrapper_class="col-md-6"),
                 css_class="row d-flex justify-content-evenly",
             ),
-            Submit("submit", "Create a job", css_class="btn btn-warning bg-gradient"),
+            # Submit("submit", "Create a job", css_class="btn btn-warning bg-gradient"),
         )
 
     def clean_deadline(self):
@@ -131,3 +133,10 @@ class JobViewForm(forms.ModelForm):
             "principal": JobModelChoiceField,
             "contractor": JobModelChoiceField,
         }
+
+
+class JobFileForm(forms.ModelForm):
+
+    class Meta:
+        model = JobFile
+        fields = ["file"]

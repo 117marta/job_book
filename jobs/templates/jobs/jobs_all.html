@@ -43,6 +43,7 @@
                         <th>Trade</th>
                         <th>Comments</th>
                         <th>Created</th>
+                        <th>Attachments</th>
                     </tr>
                 {% endwith %}
             </thead>
@@ -65,6 +66,7 @@
                         <td><span class="badge bg-secondary" >{{ job.trade }}</span></td>
                         <td>{{ job.comments }}</td>
                         <td>{{ job.created | date:"d.m.Y H:i" }}</td>
+                        <td>{{ job.has_attachments }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
