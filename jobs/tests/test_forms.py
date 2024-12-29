@@ -5,7 +5,7 @@ from django.test import TestCase
 from parameterized import parameterized
 
 from jobs.consts import DEADLINE_FORM_ERROR, JobKinds, JobStatuses
-from jobs.forms import JobCreateForm, JobViewForm
+from jobs.forms import JobCreateForm, JobFileForm, JobViewForm
 from jobs.tests.factories import JobFactory
 from trades.factories import TradeFactory
 from users.models import SITE_ENGINEER, SITE_MANAGER, SURVEYOR
@@ -98,15 +98,21 @@ class TestJobCreateForm(TestCase):
             self.assertFalse(form.is_valid())
             self.assertEqual(expected_errors, form.errors)
 
-    def test_create_a_job_with_a_file(self):
+    @parameterized.expand(["zero", "one", "two"])
+    def test_create_a_job_with_a_file(self, quantity):
         """
-        Test should pass when uploading a file.
+        Check if the test will pass depending on the number of uploaded files.
         """
         # Arrange
-        self.data.update(file=self.file)
+        if quantity == "zero":
+            data = {}
+        elif quantity == "one":
+            data = {"files": self.file}
+        else:
+            data = {"files": [self.file, self.file]}
 
         # Act
-        form = JobCreateForm(data=self.data)
+        form = JobFileForm(data=data)
 
         # Assert
         self.assertTrue(form.is_valid())

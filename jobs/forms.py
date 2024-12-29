@@ -140,3 +140,7 @@ class JobFileForm(forms.ModelForm):
     class Meta:
         model = JobFile
         fields = ["file"]
+
+        widgets = {
+            "file": forms.TextInput(attrs={"type": "File", "multiple": True}),
+        }

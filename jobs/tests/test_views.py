@@ -133,10 +133,15 @@ class TestJobsCreate(TestCase):
         cls.principal = UserFactory.create(is_active=True, role=SITE_MANAGER)
         cls.surveyor = UserFactory.create(is_active=True, role=SURVEYOR)
         cls.trade = TradeFactory.create()
-        cls.file = SimpleUploadedFile(
+        cls.file1 = SimpleUploadedFile(
             name="test_file.jpg",
             content=b"Test content",
             content_type="image/jpeg",
+        )
+        cls.file2 = SimpleUploadedFile(
+            name="test_file2.txt",
+            content=b"Test content 2",
+            content_type="text/plain",
         )
 
     def setUp(self):
@@ -185,7 +190,7 @@ class TestJobsCreate(TestCase):
             "deadline": datetime.date.today() + datetime.timedelta(days=3),
             "comments": "On-site contact with Jan Kowalski: 500600700",
         }
-        file_data = {"file": self.file}
+        file_data = {"file": [self.file1, self.file2]}
         data = job_data | file_data
 
         # Act
@@ -201,7 +206,7 @@ class TestJobsCreate(TestCase):
         self.assertEqual(Job.objects.count(), 1)
         self.assertTrue(Job.objects.filter(**job_data).exists())
         job_file = Job.objects.last().get_job_files
-        self.assertEqual(job_file.count(), 1)
+        self.assertEqual(job_file.count(), 2)
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, EMAIL_JOB_CREATE_SUBJECT)
 

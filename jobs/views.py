@@ -67,8 +67,9 @@ def job_create(request):
             trade = form.cleaned_data["trade"]
             form.save()
 
-            if files := job_file_form.cleaned_data.get("file"):
-                JobFile.objects.create(file=files, content_object=form.instance)
+            if files := request.FILES.getlist("file"):
+                for file in files:
+                    JobFile.objects.create(file=file, content_object=form.instance)
 
             send_email_with_celery.delay(
                 user_pk=contractor.pk,
