@@ -268,7 +268,7 @@ class TestJobView(TestCase):
                 self.assertIn("disabled", form["status"].as_text())
                 self.assertIn("disabled", form["comments"].as_textarea())
 
-    @mock.patch("jobs.views.send_email_with_celery")
+    @mock.patch("jobs.views.send_email")
     def test_update_a_job_and_send_emails(self, mock_email):
         """
         Contractor changes the job status, person assigned to this job and adds a comment.
@@ -296,17 +296,17 @@ class TestJobView(TestCase):
         self.assertEqual(job.status, JobStatuses.READY_TO_STAKE_OUT)
         self.assertEqual(job.comments, data["comments"])
 
-        mock_email.delay.assert_has_calls(
+        mock_email.assert_has_calls(
             [
                 # Change status -> e-mail to the Principal
                 mock.call(
-                    user_pk=self.principal.pk,
+                    recipients=[self.principal.email],
                     subject=EMAIL_JOB_CHANGE_STATUS_SUBJECT.format(self.job.pk),
                     content=mock.ANY,
                 ),
                 # Change Contractor -> e-mail to the new Contractor
                 mock.call(
-                    user_pk=self.new_contractor.pk,
+                    recipients=[self.new_contractor.email],
                     subject=EMAIL_JOB_CHANGE_CONTRACTOR_SUBJECT.format(self.job.pk),
                     content=mock.ANY,
                 ),

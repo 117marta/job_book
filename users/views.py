@@ -22,8 +22,8 @@ from users.const import (
     USERS_OBJECTS_PER_PAGE,
 )
 from users.forms import AcceptOrDeleteForm, LoginForm, RegistrationForm
+from users.helpers import send_email
 from users.models import User
-from users.tasks import send_email_with_celery
 
 
 def registration(request):
@@ -59,8 +59,8 @@ def registration(request):
             )
             user.trades.set(trades)
 
-            send_email_with_celery.delay(
-                user_pk=user.pk,
+            send_email(
+                recipients=[user.email],
                 subject=EMAIL_REGISTRATION_SUBJECT,
                 content=EMAIL_REGISTRATION_CONTENT,
             )
@@ -202,8 +202,8 @@ def accept_or_delete_inactive_users(request):
             if "action_accept" in request.POST:
                 form.accept_users(users_list)
                 for user in User.objects.filter(pk__in=users_list):
-                    send_email_with_celery.delay(
-                        user_pk=user.pk,
+                    send_email(
+                        recipients=[user.email],
                         subject=EMAIL_ACCEPTANCE_SUBJECT,
                         content=EMAIL_ACCEPTANCE_CONTENT,
                     )

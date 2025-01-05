@@ -19,7 +19,7 @@ from jobs.consts import (
 )
 from jobs.forms import JobCreateForm, JobFileForm, JobViewForm
 from jobs.models import Job, JobFile
-from users.tasks import send_email_with_celery
+from users.helpers import send_email
 
 
 @login_required
@@ -71,8 +71,8 @@ def job_create(request):
                 for file in files:
                     JobFile.objects.create(file=file, content_object=form.instance)
 
-            send_email_with_celery.delay(
-                user_pk=contractor.pk,
+            send_email(
+                recipients=[contractor.email],
                 subject=EMAIL_JOB_CREATE_SUBJECT,
                 content=EMAIL_JOB_CREATE_CONTENT.format(principal.get_full_name(), trade.name),
             )
@@ -109,8 +109,8 @@ def job_view(request, job_pk):
             if form.has_changed():
                 job_url = settings.BASE_URL + reverse("jobs-job", kwargs={"job_pk": job_pk})
                 if "status" in form.changed_data:
-                    send_email_with_celery.delay(
-                        user_pk=principal.pk,
+                    send_email(
+                        recipients=[principal.email],
                         subject=EMAIL_JOB_CHANGE_STATUS_SUBJECT.format(job_pk),
                         content=EMAIL_JOB_CHANGE_STATUS_CONTENT.format(
                             job_pk=job_pk,
@@ -119,8 +119,8 @@ def job_view(request, job_pk):
                         ),
                     )
                 if "contractor" in form.changed_data:
-                    send_email_with_celery.delay(
-                        user_pk=contractor.pk,
+                    send_email(
+                        recipients=[contractor.email],
                         subject=EMAIL_JOB_CHANGE_CONTRACTOR_SUBJECT.format(job_pk),
                         content=EMAIL_JOB_CHANGE_CONTRACTOR_CONTENT.format(
                             job_pk=job_pk, trade=job.trade, url=job_url

@@ -168,6 +168,9 @@ try:
 except ImportError:
     print("Email Backend is not configured! Please complete the data.")
 
+SEND_EMAIL_CELERY = True
+EMAIL_TEMPLATE = "users/email.html"
+
 
 # Media & avatars
 MEDIA_ROOT = os.path.join(BASE_DIR, 'static/media')

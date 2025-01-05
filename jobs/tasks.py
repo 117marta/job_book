@@ -9,7 +9,7 @@ from jobs.consts import (
     EMAIL_JOB_UPCOMING_DEADLINE_SUBJECT,
 )
 from jobs.models import Job, JOBS_CONCLUDED_STATUSES
-from users.tasks import send_email_with_celery
+from users.helpers import send_email
 
 
 @shared_task
@@ -19,8 +19,8 @@ def jobs_upcoming_deadline_contractor():
         status__in=JOBS_CONCLUDED_STATUSES
     )
     for job in jobs:
-        send_email_with_celery(
-            user_pk=job.contractor.pk,
+        send_email(
+            recipients=[job.contractor.email],
             subject=EMAIL_JOB_UPCOMING_DEADLINE_SUBJECT.format(job.pk),
             content=EMAIL_JOB_UPCOMING_DEADLINE_CONTENT.format(job.pk),
         )
@@ -31,8 +31,8 @@ def jobs_overdue_deadline_principal():
     overdue_deadline = (now() - relativedelta(days=1)).date()
     jobs = Job.objects.filter(deadline=overdue_deadline).exclude(status__in=JOBS_CONCLUDED_STATUSES)
     for job in jobs:
-        send_email_with_celery(
-            user_pk=job.principal.pk,
+        send_email(
+            recipients=[job.principal.email],
             subject=EMAIL_JOB_OVERDUE_DEADLINE_SUBJECT.format(job.pk),
             content=EMAIL_JOB_OVERDUE_DEADLINE_CONTENT.format(job.pk),
         )

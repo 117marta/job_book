@@ -25,7 +25,7 @@ class TestJobsTasks(TestCase):
             ("2024-11-05", JobStatuses.CLOSED, False),
         ]
     )
-    @patch("jobs.tasks.send_email_with_celery")
+    @patch("jobs.tasks.send_email")
     def test_jobs_upcoming_deadline_contractor(self, deadline, status, send_email, mock_email):
         """
         Tests if the Contractor of the job gets an e-mail about deadline one day earlier.
@@ -42,7 +42,7 @@ class TestJobsTasks(TestCase):
         # Assert
         if send_email:
             mock_email.assert_called_once_with(
-                user_pk=job.contractor.pk,
+                recipients=[job.contractor.email],
                 subject=EMAIL_JOB_UPCOMING_DEADLINE_SUBJECT.format(job.pk),
                 content=EMAIL_JOB_UPCOMING_DEADLINE_CONTENT.format(job.pk),
             )
@@ -57,7 +57,7 @@ class TestJobsTasks(TestCase):
             ("2024-11-08", JobStatuses.REFUSED, False),
         ]
     )
-    @patch("jobs.tasks.send_email_with_celery")
+    @patch("jobs.tasks.send_email")
     def test_jobs_overdue_deadline_principal(self, deadline, status, send_email, mock_email):
         """
         Tests if the Principal of the job gets an e-mail (one day after deadline) that it has not been completed.
@@ -74,7 +74,7 @@ class TestJobsTasks(TestCase):
         # Assert
         if send_email:
             mock_email.assert_called_once_with(
-                user_pk=job.principal.pk,
+                recipients=[job.principal.email],
                 subject=EMAIL_JOB_OVERDUE_DEADLINE_SUBJECT.format(job.pk),
                 content=EMAIL_JOB_OVERDUE_DEADLINE_CONTENT.format(job.pk),
             )
