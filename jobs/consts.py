@@ -49,3 +49,5 @@ EMAIL_JOB_UPCOMING_DEADLINE_CONTENT = (
 )
 EMAIL_JOB_OVERDUE_DEADLINE_SUBJECT = "Your job number {} has not been completed."
 EMAIL_JOB_OVERDUE_DEADLINE_CONTENT = "The deadline for the job number {} has passed and it not has been completed. Contact the Contractor to arrange the details."
+EMAIL_JOB_MONTHLY_STATUS_SUBJECT = "Jobs Monthly Status"
+EMAIL_JOB_MONTHLY_STATUS_CONTENT = "Monthly statistics for the year <strong>{year}</strong>, month <strong>{month}</strong> are in the attachment"

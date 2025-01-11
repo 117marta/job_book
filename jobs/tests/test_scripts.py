@@ -74,22 +74,10 @@ class TestMonthlyStatus(TestCase):
                 False,
             ),
             ["Number of jobs:", 5],
-            (
-                [
-                    "waiting",
-                    "accepted",
-                    "refused",
-                    "making_documents",
-                    "ready_to_stake_out",
-                    "data_passed",
-                    "ongoing",
-                    "finished",
-                    "closed",
-                ]
-            ),
-            ([2, 1, 0, 1, 0, 0, 0, 1, 0]),
-            (["staking", "inventory", "other"]),
-            ([2, 2, 1]),
+            JobStatuses.values,
+            [2, 1, 0, 1, 0, 0, 0, 1, 0],
+            JobKinds.values,
+            [2, 2, 1],
         ]
 
         # Act

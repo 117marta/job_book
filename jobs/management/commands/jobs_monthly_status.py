@@ -1,16 +1,22 @@
 import csv
 import datetime
+import os
 
 from dateutil.relativedelta import relativedelta
 from django.core.management.base import BaseCommand
 from django.db.models import CharField, Count, Exists, F, Func, OuterRef, Q, Value
 
+from job_book.settings import MEDIA_ROOT
+from jobs.consts import EMAIL_JOB_MONTHLY_STATUS_CONTENT, EMAIL_JOB_MONTHLY_STATUS_SUBJECT
 from jobs.models import Job, JobFile
+from users.helpers import send_email
+from users.models import CONTRACT_DIRECTOR, CONTRACT_MANAGER, User
 
 FIELD_NAMES = ["id", "date_formatted", "status", "kind", "has_attachments"]
 today = datetime.date.today()
 last_month = today - relativedelta(months=1)
-file_name = f"{last_month.year}_{last_month.month}_jobs_monthly_status"
+file_name = f"{last_month.year}_{last_month.month}_jobs_monthly_status.csv"
+directory = "reports"
 
 
 class Command(BaseCommand):
@@ -18,10 +24,31 @@ class Command(BaseCommand):
 
     @staticmethod
     def export_csv(data):
-        with open(file=file_name, mode="w") as file:
+        """Save the monthly statistics as a CSV file and send it by an e-mail."""
+        try:
+            os.makedirs(os.path.join(MEDIA_ROOT, directory))
+        except OSError:
+            pass
+        csv_file = os.path.join(MEDIA_ROOT, directory, file_name)
+
+        with open(file=csv_file, mode="w") as file:
             writer = csv.writer(file, dialect="excel")
             writer.writerow(FIELD_NAMES)
             writer.writerows(data)
+
+        users_email_list = list(
+            User.objects.filter(role__in=[CONTRACT_DIRECTOR, CONTRACT_MANAGER]).values_list(
+                "email", flat=True
+            )
+        )
+        send_email(
+            recipients=users_email_list,
+            subject=EMAIL_JOB_MONTHLY_STATUS_SUBJECT,
+            content=EMAIL_JOB_MONTHLY_STATUS_CONTENT.format(
+                year=last_month.year, month=last_month.strftime("%B")
+            ),
+            attachments=[csv_file],
+        )
 
     def handle(self, *args, **options):
         data = (
