@@ -1,5 +1,6 @@
 from celery import shared_task
 from dateutil.relativedelta import relativedelta
+from django.core.management import call_command
 from django.utils.timezone import now
 
 from jobs.consts import (
@@ -36,3 +37,8 @@ def jobs_overdue_deadline_principal():
             subject=EMAIL_JOB_OVERDUE_DEADLINE_SUBJECT.format(job.pk),
             content=EMAIL_JOB_OVERDUE_DEADLINE_CONTENT.format(job.pk),
         )
+
+
+@shared_task
+def jobs_monthly_status_report():
+    call_command("jobs_monthly_status")

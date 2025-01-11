@@ -212,15 +212,20 @@ BASE_URL = urlunparse((SCHEME, NETLOC, "", None, None, None))
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
 CELERY_BEAT_SCHEDULE = {
-    'jobs_upcoming_deadline_contractor': {
+    'jobs-upcoming-deadline-contractor': {
         'task': 'jobs.tasks.jobs_upcoming_deadline_contractor',
         'schedule': crontab(hour="0", minute="15"),
     },
-    'jobs_overdue_deadline_principal': {
+    'jobs-overdue-deadline-principal': {
         'task': 'jobs.tasks.jobs_overdue_deadline_principal',
         'schedule': crontab(hour="0", minute="30"),
     },
+    'jobs-monthly-status-report': {
+        'task': 'jobs.tasks.jobs_monthly_status_report',
+        'schedule': crontab(day_of_month="1", hour="2", minute="00"),
+    }
 }
+
 
 # Login URL
 LOGIN_URL = "login"
