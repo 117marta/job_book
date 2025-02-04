@@ -10,4 +10,5 @@ urlpatterns = [
     path("users-all/", views.users_all, name="users-all"),
     path("accept-or-delete/", views.accept_or_delete_inactive_users, name="accept-or-delete"),
     path("api/get-users/", api_views.get_users, name="api-get-users"),
+    path("api/create-user/", api_views.create_user, name="api-create-user"),
 ]
