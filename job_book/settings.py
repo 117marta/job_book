@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'crispy_bootstrap5',
     'jobs',
     'django_celery_beat',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
