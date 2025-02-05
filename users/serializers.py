@@ -36,3 +36,19 @@ class UserCreateSerializer(serializers.ModelSerializer):
         model = User
         fields = "__all__"
         extra_kwargs = {"password": {"write_only": True}}
+
+
+class UserDetailsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = (
+            "first_name",
+            "last_name",
+            "email",
+            "role",
+            "phone",
+            "trades",
+            "birth_date",
+        )
+        extra_kwargs = {field.name: {"required": False} for field in User._meta.get_fields()}
